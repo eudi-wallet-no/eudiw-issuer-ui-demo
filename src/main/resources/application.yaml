@@ -81,7 +81,14 @@ issuer-ui-demo:
               }
             ]
           }
-
+      - credential-configuration-id: no.advokattilsynet.advokatregisteret_mso_mdoc
+        description: Advokatbevilling
+        json-request: |
+          {
+            "credential_configuration_id": "no.advokattilsynet.advokatregisteret_mso_mdoc",
+            "subject_identifier": "012345678901",
+            "subject_identifier_type": "Fødselsnummer"
+          }
 # Maskinporten
 maskinporten:
   oauth2:
@@ -90,7 +97,7 @@ maskinporten:
     audience:
       - ${maskinporten.oauth2.issuer}
     token-endpoint: ${maskinporten.oauth2.issuer}token
-    scope: eudiw:no:skatteetaten:nnid eudiw:no:minid:mpid
+    scope: eudiw:no:skatteetaten:nnid eudiw:no:minid:mpid eudiw:no:advokattilsynet:advokatregisteret
     resource: ${issuer-ui-demo.issuer-server.base-url}
   jwt-signing-config: #to authenticate towards maskinporten
     key-store-type: JKS
