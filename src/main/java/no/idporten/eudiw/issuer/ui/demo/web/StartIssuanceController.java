@@ -60,7 +60,7 @@ public class StartIssuanceController {
             Model model) {
         CredentialConfiguration credentialConfiguration = properties.findCredentialConfiguration(credentialConfigurationId);
         model.addAttribute("credentialConfiguration", credentialConfiguration);
-        model.addAttribute("startIssuanceForm", new StartIssuanceForm(credentialConfiguration.jsonRequest(), "12345678901"));
+        model.addAttribute("startIssuanceForm", new StartIssuanceForm(credentialConfiguration.jsonRequest(), credentialConfiguration.personIdentifier()));
         return "start";
     }
 
