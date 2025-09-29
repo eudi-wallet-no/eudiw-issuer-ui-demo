@@ -86,12 +86,13 @@ issuer-ui-demo:
       - credential-configuration-id: no.advokattilsynet.advokatregisteret_mso_mdoc
         description: Advokatbevilling
         scope: eudiw:no:advokattilsynet:advokatregisteret
-        person-identifier: 012345678901
+        person-identifier: 12345678901
         json-request: |
           {
             "credential_configuration_id": "no.advokattilsynet.advokatregisteret_mso_mdoc",
-            "subject_identifier": "012345678901",
-            "subject_identifier_type": "Fødselsnummer"
+            "subject": {
+              "identifier": "12345678901"
+            }
           }
 # Maskinporten
 maskinporten:
