@@ -41,7 +41,7 @@ issuer-ui-demo:
             "credential_configuration_id": "no.skatteetaten.nnid_mso_mdoc",
             "subject": {
               "identifier": "12345678901"
-            }
+            },
             "claims": [
               {
                 "name": "norwegian_national_id_number",
@@ -61,7 +61,7 @@ issuer-ui-demo:
             "credential_configuration_id": "no.minid.mpid_mso_mdoc",
             "subject": {
               "identifier": "24838674964"
-            }
+            },
             "claims": [
               {
                 "name": "personal_administrative_number",
