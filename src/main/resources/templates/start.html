@@ -16,7 +16,6 @@
         <p class="ds-paragraph"
            th:text="|Start utferdig av ${credentialConfiguration.description} med Digdir sin generelle utferdar (issuer)|">
         </p>
-        <button class="ds-button ds-button--tertiary" id="scrollToBottomBtn" type="button" data-variant="tertiary">Til botn</button>
     </div>
 
     <form th:fragment="send_attributes_form_fragment"
@@ -46,7 +45,8 @@
             <textarea id="eaa_data_field"
                       placeholder=""
                       class="ds-input"
-                      th:field="*{json}">
+                      th:field="*{json}"
+                      style="max-height:500px;min-height:500px; resize: none">
                     </textarea>
         </p>
 
@@ -62,18 +62,4 @@
 
 <footer th:replace="~{fragments/general :: page_footer_fragment(issuer=${issuerUrl})}"></footer>
 </body>
-<script type="application/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
-
-        if (scrollToBottomBtn) {
-            scrollToBottomBtn.addEventListener('click', function() {
-                window.scrollTo({
-                    top: document.body.scrollHeight,
-                    behavior: 'smooth' // For smooth scrolling effect
-                });
-            });
-        }
-    });
-</script>
 </html>
