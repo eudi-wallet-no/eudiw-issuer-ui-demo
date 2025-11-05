@@ -115,7 +115,7 @@ issuer-ui-demo:
           }
       - credential-configuration-id: org.iso.18013.5.1.mDL_mso_mdoc
         description: Førerkort
-        scope: eudiw:org:iso:18013:5:1:mdl
+        scope: eudiw:no:vegvesen:mdl
         person-identifier: 16903349844
         json-request: |
           {
@@ -155,7 +155,7 @@ maskinporten:
         audience:
           - ${maskinporten.lib.issuer}
         token-endpoint: ${maskinporten.lib.issuer}token
-        scope: eudiw:no:skatteetaten:nnid eudiw:no:minid:mpid eudiw:no:advokattilsynet:advokatregisteret eudiw:no:kontaktregisteret:kontaktinformasjon eudiw:org:iso:18013:5:1:mdl
+        scope: eudiw:no:skatteetaten:nnid eudiw:no:minid:mpid eudiw:no:advokattilsynet:advokatregisteret eudiw:no:kontaktregisteret:kontaktinformasjon eudiw:no:vegvesen:mdl
         resource: ${issuer-ui-demo.issuer-server.base-url}
         connect-timeout-ms: 5000
         read-timeout-ms: 2000
