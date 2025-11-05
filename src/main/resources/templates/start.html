@@ -16,6 +16,7 @@
         <p class="ds-paragraph"
            th:text="|Start utferdig av ${credentialConfiguration.description} med Digdir sin generelle utferdar (issuer)|">
         </p>
+        <button class="ds-button ds-button--tertiary" id="scrollToBottomBtn" type="button" data-variant="tertiary">Til botn</button>
     </div>
 
     <form th:fragment="send_attributes_form_fragment"
@@ -23,7 +24,6 @@
           th:action="@{/start-issuance/{id}(id = ${credentialConfiguration.credentialConfigurationId})}"
           th:object="${startIssuanceForm}"
           method="POST">
-
 
         <p class="ds-paragraph" th:if="${credentialConfiguration.personIdentifier()}">
             <label for="person_identifier"
@@ -62,4 +62,18 @@
 
 <footer th:replace="~{fragments/general :: page_footer_fragment(issuer=${issuerUrl})}"></footer>
 </body>
+<script type="application/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+
+        if (scrollToBottomBtn) {
+            scrollToBottomBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth' // For smooth scrolling effect
+                });
+            });
+        }
+    });
+</script>
 </html>
