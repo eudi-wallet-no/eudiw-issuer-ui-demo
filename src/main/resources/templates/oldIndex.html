@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="nn-no">
+<head>
+    <th:block th:replace="~{fragments/general :: base_head_fragment}"></th:block>
+    <title>Bevisgenerator</title>
+</head>
+
+<body>
+<header th:replace="~{fragments/general :: page_header_fragment}"></header>
+
+<main>
+    <div>
+        <h1 class="ds-heading" data-size="lg">
+            Bevisgenerator testverktøy
+        </h1>
+        <p class="ds-paragraph">
+            Bevisgenerator er eit testverktøy som lar deg, på ein enkel måte, lage nye digitale bevis utan å måtte kode eller konfigurere opp din eigen utstedar-teneste.
+        </p>
+    </div>
+    <div class="flex-container">
+        <a th:href="@{/}" class="ds-card"
+           data-variant="neutral" style="max-width: 500px">
+            <h2 class="ds-heading">Bevistypar</h2>
+            <p class="ds-paragraph" data-variant="neutral">
+                Her kan du lage eller modifisere bevistypar og tilhøyrande datamodell
+            </p>
+        </a>
+        <a th:href="@{/}" class="ds-card"
+           data-variant="neutral" style="max-width: 500px">
+            <h2 class="ds-heading">Lage bevis</h2>
+            <p class="ds-paragraph" data-variant="neutral">
+                Lag eit bevis ved å skrive inn noko dummy-data og deretter overføre det til ei lommebok
+            </p>
+        </a>
+    </div>
+    <div>
+        <p class="ds-paragraph">
+            Denne tenesta er eit GUI foran "extended APIet" til BYOB-utstedaren (Bring-Your-Own-Bevis)
+        </p>
+    </div>
+
+</main>
+<footer th:replace="~{fragments/general :: page_footer_fragment(issuer=${issuerUrl})}"></footer>
+</body>
+</html>

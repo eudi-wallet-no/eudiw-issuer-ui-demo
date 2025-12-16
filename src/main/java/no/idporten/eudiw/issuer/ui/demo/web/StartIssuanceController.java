@@ -48,15 +48,15 @@ public class StartIssuanceController {
         return properties.credentialIssuer();
     }
 
-    @GetMapping("/")
+    @GetMapping("/oldIndex")
     public String newIndex(Model model) {
-        return "index";
+        return "oldIndex";
     }
 
-    @GetMapping("/credentialTypes")
+    @GetMapping("/")
     public String index(Model model) {
         model.addAttribute("credential_configurations", properties.credentialConfigurations());
-        return "credentialTypes";
+        return "index";
     }
 
     @GetMapping("/start-issuance/{credential_configuration_id}")
