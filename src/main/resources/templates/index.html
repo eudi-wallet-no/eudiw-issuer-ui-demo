@@ -26,7 +26,7 @@
                     <p class="ds-paragraph" data-variant="neutral" th:text="${credentialConfiguration.credentialConfigurationId}"></p>
                 </div>
                 <div style="display: flex; align-items: end; justify-content: flex-end;">
-                    <button data-edit-button class="ds-button" data-variant="secondary">Edit</button>
+                    <button data-edit-button th:for="${credentialConfiguration.credentialConfigurationId()}" class="ds-button" data-variant="secondary">Rediger</button>
                 </div>
             </a>
         </th:block>
@@ -46,13 +46,15 @@
         (function() {
            const buttons = document.querySelectorAll("[data-edit-button]");
            for (let i = 0; i < buttons.length; i++) {
-               buttons[i].addEventListener("click", editClick);
+               const id = buttons[i].getAttribute("for");
+               buttons[i].addEventListener("click", (e) => editClick(e, id));
            }
         })();
-        function editClick(e) {
+        function editClick(e, id) {
             e.preventDefault();
             e.stopPropagation();
-
+            console.log("ID: ", id);
+            // window.location.href="/editCredential"
             // TODO: Go to edit view
         }
     })();
