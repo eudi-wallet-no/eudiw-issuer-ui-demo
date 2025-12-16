@@ -95,6 +95,19 @@ public class StartIssuanceController {
         return "issuer_response";
     }
 
+    @GetMapping("/addCredential")
+    public String addCredential(Model model) {
+        model.addAttribute("addCredentialForm", new AddCredentialForm("", ""));
+        return "add";
+    }
+
+    @PostMapping("/addCredential/{credential_configuration_id}")
+    public String addNewCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId,
+                                @ModelAttribute("startIssuanceForm") StartIssuanceForm startIssuanceForm,
+                                Model model) {
+        return "index";
+    }
+
     private IssuanceRequest createRequestTraceing(StartIssuanceForm startIssuanceForm) {
         String contentType = "Content-Type: " + MediaType.APPLICATION_JSON;
         String authorization = "Authorization: Bearer [Maskinporten-token]";
