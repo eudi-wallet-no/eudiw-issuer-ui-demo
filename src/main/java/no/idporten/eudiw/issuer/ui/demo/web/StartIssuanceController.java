@@ -48,15 +48,21 @@ public class StartIssuanceController {
         return properties.credentialIssuer();
     }
 
-    @GetMapping("/oldIndex")
+    @GetMapping("/")
     public String newIndex(Model model) {
-        return "oldIndex";
+        return "index";
     }
 
-    @GetMapping("/")
-    public String index(Model model) {
+    @GetMapping("/administrate")
+    public String administrate(Model model) {
         model.addAttribute("credential_configurations", properties.credentialConfigurations());
-        return "index";
+        return "administrate";
+    }
+
+    @GetMapping("/issue")
+    public String issue(Model model) {
+        model.addAttribute("credential_configurations", properties.credentialConfigurations());
+        return "issue";
     }
 
     @GetMapping("/start-issuance/{credential_configuration_id}")
@@ -105,7 +111,7 @@ public class StartIssuanceController {
     public String addNewCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId,
                                 @ModelAttribute("startIssuanceForm") StartIssuanceForm startIssuanceForm,
                                 Model model) {
-        return "index";
+        return "administrate";
     }
 
     private IssuanceRequest createRequestTraceing(StartIssuanceForm startIssuanceForm) {

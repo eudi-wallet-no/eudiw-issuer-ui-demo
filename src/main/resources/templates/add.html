@@ -21,12 +21,16 @@
           th:object="${addCredentialForm}"
           method="POST">
 
+        <div class="ds-field">
+            <label class="ds-label" for="name">Navn</label>
+            <input class="ds-input" type="text" id="name" name="name">
+        </div>
 
         <button class="ds-button ds-button--primary"
                 type="submit"
                 form="add_attributes_form"
                 data-variant="primary">
-            Start utferding av bevis
+            Legg til bevistype
         </button>
     </form>
 
