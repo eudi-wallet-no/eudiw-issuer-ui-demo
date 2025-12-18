@@ -53,10 +53,10 @@ public class StartIssuanceController {
         return "index";
     }
 
-    @GetMapping("/administrate")
-    public String administrate(Model model) {
+    @GetMapping("/admin")
+    public String admin(Model model) {
         model.addAttribute("credential_configurations", properties.credentialConfigurations());
-        return "administrate";
+        return "admin";
     }
 
     @GetMapping("/issue")
@@ -111,7 +111,7 @@ public class StartIssuanceController {
     public String addNewCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId,
                                 @ModelAttribute("startIssuanceForm") StartIssuanceForm startIssuanceForm,
                                 Model model) {
-        return "administrate";
+        return "admin";
     }
 
     private IssuanceRequest createRequestTraceing(StartIssuanceForm startIssuanceForm) {
