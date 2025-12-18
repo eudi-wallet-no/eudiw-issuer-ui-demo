@@ -101,13 +101,13 @@ public class StartIssuanceController {
         return "issuer_response";
     }
 
-    @GetMapping("/addCredential")
+    @GetMapping("/add-credential")
     public String addCredential(Model model) {
         model.addAttribute("addCredentialForm", new AddCredentialForm("", ""));
         return "add";
     }
 
-    @PostMapping("/addCredential/{credential_configuration_id}")
+    @PostMapping("/add-credential/{credential_configuration_id}")
     public String addNewCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId,
                                 @ModelAttribute("startIssuanceForm") StartIssuanceForm startIssuanceForm,
                                 Model model) {
