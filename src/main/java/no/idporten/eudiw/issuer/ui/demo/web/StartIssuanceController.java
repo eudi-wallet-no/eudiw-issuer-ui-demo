@@ -103,7 +103,7 @@ public class StartIssuanceController {
 
     @GetMapping("/add-credential")
     public String addCredential(Model model) {
-        model.addAttribute("addCredentialForm", new AddCredentialForm("", ""));
+        model.addAttribute("addCredentialForm", new AddCredentialForm());
         return "add";
     }
 
