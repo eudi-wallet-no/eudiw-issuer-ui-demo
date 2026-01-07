@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(ignoreInvalidFields = true, prefix = "bevisgenerator")
 public class BevisgeneratorProperties {
 
-    private FeatureSwitches featureSwitches;
+    private final FeatureSwitches featureSwitches;
 
     @Autowired
     public BevisgeneratorProperties(FeatureSwitches featureSwitches) {
@@ -20,7 +20,4 @@ public class BevisgeneratorProperties {
         return featureSwitches;
     }
 
-    public void setFeatureSwitches(FeatureSwitches featureSwitches) {
-        this.featureSwitches = featureSwitches;
-    }
 }
