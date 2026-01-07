@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "bevisgenerator.features")
 public class FeatureSwitches implements InitializingBean {
 
-    Logger log = LoggerFactory.getLogger(FeatureSwitches.class);
+    private final static Logger log = LoggerFactory.getLogger(FeatureSwitches.class);
 
     /**
      * Allow creation of bevistype (BYOB).
