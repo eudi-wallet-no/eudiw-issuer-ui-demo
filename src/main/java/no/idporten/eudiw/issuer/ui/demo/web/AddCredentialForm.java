@@ -10,11 +10,16 @@ public record AddCredentialForm(
         @NotBlank(message = "VCT er påkrevd")
         @Pattern(
                 regexp = "^[a-z0-9_:]{3,155}",
-                message = "VCT kan kun bestå av små bokstaver, tall og kolon - 3-150 tegn"
+                message = "VCT kan kun bestå av små bokstaver, tall og kolon - 3-155 tegn"
         )
-         String vct
+        String vct,
+        String json
 ) {
     public AddCredentialForm() {
-        this("");
+        this("", "");
+    }
+
+    public AddCredentialForm(String json) {
+        this("", json);
     }
 }

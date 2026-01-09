@@ -8,6 +8,8 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import jakarta.validation.Valid;
+import no.idporten.eudiw.issuer.ui.demo.byob.CredentialDefinitionFactory;
+import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import no.idporten.eudiw.issuer.ui.demo.config.BevisgeneratorProperties;
 import no.idporten.eudiw.issuer.ui.demo.exception.IssuerUiException;
 import no.idporten.eudiw.issuer.ui.demo.issuer.IssuerServerService;
@@ -112,8 +114,16 @@ public class StartIssuanceController {
     }
 
     @GetMapping("/add-credential")
-    public ModelAndView addCredential() {
-        return new ModelAndView("add", "addCredentialForm", new AddCredentialForm());
+    public ModelAndView addCredential() throws JsonProcessingException {
+        CredentialDefinition empty = CredentialDefinitionFactory.empty();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(empty);
+
+
+        return new ModelAndView("add", "addCredentialForm", new AddCredentialForm(json));
     }
 
     @PostMapping("/add-credential")
