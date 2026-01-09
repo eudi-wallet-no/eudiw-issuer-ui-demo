@@ -7,6 +7,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import jakarta.validation.Valid;
 import no.idporten.eudiw.issuer.ui.demo.config.BevisgeneratorProperties;
 import no.idporten.eudiw.issuer.ui.demo.exception.IssuerUiException;
 import no.idporten.eudiw.issuer.ui.demo.issuer.IssuerServerService;
@@ -19,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -111,15 +114,15 @@ public class StartIssuanceController {
     }
 
     @GetMapping("/add-credential")
-    public String addCredential(Model model) {
-        model.addAttribute("addCredentialForm", new AddCredentialForm());
-        return "add";
+    public ModelAndView addCredential() {
+        return new ModelAndView("add", "addCredentialForm", new AddCredentialForm());
     }
 
-    @PostMapping("/add-credential/{credential_configuration_id}")
-    public String addNewCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId,
-                                @ModelAttribute("startIssuanceForm") StartIssuanceForm startIssuanceForm,
-                                Model model) {
+    @PostMapping("/add-new-credential")
+    public String addNewCredential(@Valid AddCredentialForm addCredentialForm, BindingResult bindingResult, Model model) {
+
+
+
         return "admin";
     }
 
