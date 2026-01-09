@@ -66,15 +66,13 @@ public class StartIssuanceController {
     }
 
     @GetMapping("/admin")
-    public String admin(Model model) {
-        model.addAttribute("credential_configurations", properties.credentialConfigurations());
-        return "admin";
+    public ModelAndView admin() {
+        return new ModelAndView("admin", "credential_configurations", properties.credentialConfigurations());
     }
 
     @GetMapping("/issue")
-    public String issue(Model model) {
-        model.addAttribute("credential_configurations", properties.credentialConfigurations());
-        return "issue";
+    public ModelAndView issue() {
+        return new ModelAndView("issue", "credential_configurations", properties.credentialConfigurations());
     }
 
     @GetMapping("/start-issuance/{credential_configuration_id}")
@@ -118,12 +116,16 @@ public class StartIssuanceController {
         return new ModelAndView("add", "addCredentialForm", new AddCredentialForm());
     }
 
-    @PostMapping("/add-new-credential")
-    public String addNewCredential(@Valid AddCredentialForm addCredentialForm, BindingResult bindingResult, Model model) {
+    @PostMapping("/add-credential")
+    public ModelAndView addNewCredential(@Valid AddCredentialForm addCredentialForm, BindingResult bindingResult, Model model) {
 
+        if (bindingResult.hasErrors()) {
+            System.out.println("BindingResult errors: " + bindingResult.getAllErrors());
+            return new ModelAndView("add", "addCredentialForm", addCredentialForm);
+        }
 
+        return new ModelAndView("redirect:/admin", "credential_configurations", properties.credentialConfigurations());
 
-        return "admin";
     }
 
     private IssuanceRequest createRequestTraceing(StartIssuanceForm startIssuanceForm) {

@@ -17,13 +17,26 @@
 
     <form th:fragment="add_attributes_form_fragment"
           id="add_attributes_form"
-          th:action="@{/add-new-credential}"
+          th:action="@{/add-credential}"
           th:object="${addCredentialForm}"
           method="POST">
 
-        <div class="ds-field">
+        <div class="ds-field"
+             th:classappend="${#fields.hasErrors('vct')} ? 'ds-field--error'">
+
             <label class="ds-label" for="vct">ID (vct)</label>
-            <input class="ds-input" type="text" id="vct" th:field="*{vct}">
+
+            <input class="ds-input"
+                   type="text"
+                   id="vct"
+                   th:field="*{vct}">
+
+            <div th:if="${#fields.hasErrors('vct')}">
+                <div class="ds-validation-message"
+                     data-field="validation"
+                    th:each="error : ${#fields.errors('vct')}" th:text="${error}">
+                </div>
+            </div>
         </div>
 
         <button class="ds-button ds-button--primary"
