@@ -9,30 +9,40 @@ public class CredentialDefinitionFactory {
 
     public static CredentialDefinition empty() {
         return new CredentialDefinition(
-                "",
-                new ExampleCredentialData(Map.of()),
-                new CredentialMetadata(
-                        List.of(
-                                new Display(
-                                        "",
-                                        "",
-                                        null,
-                                        null
-                                )
-                        ),
-                        List.of(
-                                new Claim(
-                                        "",
-                                        true,
-                                        new Display(
-                                                "",
-                                                "",
-                                                null,
-                                                null
-                                        )
-                                )
+            "eidas2.[your-certificate-name].123",
+            new ExampleCredentialData(Map.of("family-name", "Normann", "given-name", "Kari")),
+            new CredentialMetadata(
+                List.of(
+                    new Display(
+                        "",
+                        "no",
+                        null,
+                        null
+                    )
+                ),
+                List.of(
+                    new Claim(
+                        "family-name",
+                        true,
+                        new Display(
+                            "Etternavn",
+                            "no",
+                            null,
+                            null
+                        )
+                    ),
+                        new Claim(
+                            "given_name",
+                            true,
+                            new Display(
+                                "Fornavn",
+                                "no",
+                                null,
+                                null
+                            )
                         )
                 )
+            )
         );
     }
 }

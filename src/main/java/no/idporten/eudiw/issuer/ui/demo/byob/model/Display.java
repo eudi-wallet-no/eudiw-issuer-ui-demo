@@ -6,5 +6,4 @@ public record Display(
         String locale,
         String background_color,
         String text_color
-
 ) {}

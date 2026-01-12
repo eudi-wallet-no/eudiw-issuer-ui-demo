@@ -122,20 +122,23 @@ public class StartIssuanceController {
                 .writerWithDefaultPrettyPrinter()
                 .writeValueAsString(empty);
 
-
         return new ModelAndView("add", "addCredentialForm", new AddCredentialForm(json));
     }
 
     @PostMapping("/add-credential")
-    public ModelAndView addNewCredential(@Valid AddCredentialForm addCredentialForm, BindingResult bindingResult, Model model) {
+    public ModelAndView addNewCredential(@Valid AddCredentialForm addCredentialForm, BindingResult bindingResult, Model model) throws JsonProcessingException {
 
         if (bindingResult.hasErrors()) {
             System.out.println("BindingResult errors: " + bindingResult.getAllErrors());
             return new ModelAndView("add", "addCredentialForm", addCredentialForm);
         }
 
-        return new ModelAndView("redirect:/admin", "credential_configurations", properties.credentialConfigurations());
+        ObjectMapper mapper = new ObjectMapper();
+        CredentialDefinition cd = mapper.readValue(addCredentialForm.json(), CredentialDefinition.class);
 
+        properties.credentialConfigurations().add(new CredentialConfiguration(addCredentialForm.vct(), "", "16903349844", addCredentialForm.vct(), addCredentialForm.json()));
+
+        return new ModelAndView("redirect:/admin", "credential_configurations", properties.credentialConfigurations());
     }
 
     private IssuanceRequest createRequestTraceing(StartIssuanceForm startIssuanceForm) {
