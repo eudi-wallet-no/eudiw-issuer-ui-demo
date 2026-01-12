@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import no.idporten.eudiw.issuer.ui.demo.byob.ByobService;
 import no.idporten.eudiw.issuer.ui.demo.byob.CredentialDefinitionFactory;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
+import no.idporten.eudiw.issuer.ui.demo.certificates.CertificateService;
 import no.idporten.eudiw.issuer.ui.demo.config.BevisgeneratorProperties;
 import no.idporten.eudiw.issuer.ui.demo.exception.IssuerUiException;
 import no.idporten.eudiw.issuer.ui.demo.issuer.IssuerServerService;
@@ -44,14 +45,17 @@ public class StartIssuanceController {
 
     private final IssuerServerProperties properties;
 
+    private final CertificateService certificateService;
+
     private final BevisgeneratorProperties bevisgeneratorProperties;
 
     private final ByobService byobService;
 
     @Autowired
-    public StartIssuanceController(IssuerServerService issuerServerService, IssuerServerProperties properties, BevisgeneratorProperties bevisgeneratorProperties, ByobService byobService) {
+    public StartIssuanceController(IssuerServerService issuerServerService, IssuerServerProperties properties, CertificateService certificateService, BevisgeneratorProperties bevisgeneratorProperties, ByobService byobService) {
         this.issuerServerService = issuerServerService;
         this.properties = properties;
+        this.certificateService = certificateService;
         this.bevisgeneratorProperties = bevisgeneratorProperties;
         this.byobService = byobService;
     }
@@ -73,7 +77,7 @@ public class StartIssuanceController {
 
     @GetMapping("/admin")
     public ModelAndView admin() {
-        return new ModelAndView("admin", "credential_configurations", properties.credentialConfigurations());
+        return new ModelAndView("admin", "credential_configurations", certificateService.getCredentialConfigurations());
     }
 
     @GetMapping("/issue")
@@ -139,9 +143,11 @@ public class StartIssuanceController {
 
         ObjectMapper mapper = new ObjectMapper();
         CredentialDefinition cd = mapper.readValue(addCredentialForm.json(), CredentialDefinition.class);
-        byobService.addCustomCredentialDefinition(addCredentialForm.vct(), cd);
 
-        properties.credentialConfigurations().add(new CredentialConfiguration(addCredentialForm.vct(), "", "16903349844", addCredentialForm.vct(), addCredentialForm.json()));
+        cd.setVct(addCredentialForm.vct());
+        byobService.addCustomCredentialDefinition(cd);
+
+        properties.credentialConfigurations().add(new CredentialConfiguration(addCredentialForm.vct(), "", "16903349844", addCredentialForm.vct(), addCredentialForm.json(), false));
 
         return new ModelAndView("redirect:/admin", "credential_configurations", properties.credentialConfigurations());
     }

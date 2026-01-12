@@ -23,7 +23,7 @@
             <th:block th:each="cc: ${credential_configurations}">
                 <li style="list-style-type: none; display: flex; justify-content: space-between; max-width: 700px;">
                     <p th:text="${cc.description()}">Navn</p>
-                    <div style="display: flex; align-items: center; justify-content: center;">
+                    <div th:if="${!cc.readonly()}" style="display: flex; align-items: center; justify-content: center;">
                         <a th:href="@{/edit-credential/{id}(id=${cc.credentialConfigurationId})}" style="text-decoration: none">
                             <button class="ds-button" data-size="sm" data-variant="tertiary">Rediger</button>
                         </a>

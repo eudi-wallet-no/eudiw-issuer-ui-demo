@@ -14,8 +14,8 @@ public class ByobService {
         return customCredentialDefinitions;
     }
 
-    public void addCustomCredentialDefinition(String key, CredentialDefinition cd) {
-        customCredentialDefinitions.put(key, cd);
+    public void addCustomCredentialDefinition(CredentialDefinition cd) {
+        customCredentialDefinitions.put(cd.getVct(), cd);
     }
 
     public CredentialDefinition getCustomCredentialDefinition(String key) {
