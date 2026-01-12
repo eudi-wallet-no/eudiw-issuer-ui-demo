@@ -34,21 +34,24 @@ public class CertificateService {
         return issuerServerProperties;
     }
 
+    public List<CredentialConfiguration> getAllCredentialsConfigurations() {
+        List<CredentialConfiguration> result = new ArrayList<>();
+        result.addAll(this.credentialConfigurations);
+        result.addAll(getAllCredentialsConfigurations());
+        return result;
+    }
+
     public List<CredentialConfiguration> getCredentialConfigurations() {
         Collection<CredentialDefinition> credentialDefinitions = this.byobService.getCustomCredentialDefinitions().values();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<CredentialConfiguration> credentialConfigurations = credentialDefinitions.stream().map(cd -> {
+
+        return credentialDefinitions.stream().map(cd -> {
             try {
                 return new CredentialConfiguration(cd.getVct(), "", "16903349844", cd.getVct(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cd), false);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }).toList();
-
-        List<CredentialConfiguration> result = new ArrayList<>();
-        result.addAll(this.credentialConfigurations);
-        result.addAll(credentialConfigurations);
-        return result;
     }
 }
