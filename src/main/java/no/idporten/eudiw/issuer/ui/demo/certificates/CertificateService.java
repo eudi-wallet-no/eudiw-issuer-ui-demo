@@ -2,7 +2,6 @@ package no.idporten.eudiw.issuer.ui.demo.certificates;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import no.idporten.eudiw.issuer.ui.demo.byob.ByobService;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import no.idporten.eudiw.issuer.ui.demo.issuer.config.CredentialConfiguration;
@@ -37,11 +36,11 @@ public class CertificateService {
     public List<CredentialConfiguration> getAllCredentialsConfigurations() {
         List<CredentialConfiguration> result = new ArrayList<>();
         result.addAll(this.credentialConfigurations);
-        result.addAll(getAllCredentialsConfigurations());
+        result.addAll(getCustomCredentialConfigurations());
         return result;
     }
 
-    public List<CredentialConfiguration> getCredentialConfigurations() {
+    public List<CredentialConfiguration> getCustomCredentialConfigurations() {
         Collection<CredentialDefinition> credentialDefinitions = this.byobService.getCustomCredentialDefinitions().values();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -53,5 +52,18 @@ public class CertificateService {
                 throw new RuntimeException(e);
             }
         }).toList();
+    }
+
+    public CredentialConfiguration findCredentialConfiguration(String credentialConfigurationId) {
+        CredentialConfiguration credentialConfiguration = issuerServerProperties.findCredentialConfiguration(credentialConfigurationId);
+        if (credentialConfiguration != null) {
+            return credentialConfiguration;
+        }
+
+        return getCustomCredentialConfigurations()
+                .stream()
+                .filter(cc -> cc.credentialConfigurationId().equals(credentialConfigurationId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown credential configuration id"));
     }
 }

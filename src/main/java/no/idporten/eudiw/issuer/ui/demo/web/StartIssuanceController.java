@@ -77,19 +77,19 @@ public class StartIssuanceController {
 
     @GetMapping("/admin")
     public ModelAndView admin() {
-        return new ModelAndView("admin", "credential_configurations", certificateService.getCredentialConfigurations());
+        return new ModelAndView("admin", "credential_configurations", certificateService.getCustomCredentialConfigurations());
     }
 
     @GetMapping("/issue")
     public ModelAndView issue() {
-        return new ModelAndView("issue", "credential_configurations", properties.credentialConfigurations());
+        return new ModelAndView("issue", "credential_configurations", certificateService.getAllCredentialsConfigurations());
     }
 
     @GetMapping("/start-issuance/{credential_configuration_id}")
     public String start(
             @PathVariable("credential_configuration_id") String credentialConfigurationId,
             Model model) {
-        CredentialConfiguration credentialConfiguration = properties.findCredentialConfiguration(credentialConfigurationId);
+        CredentialConfiguration credentialConfiguration = certificateService.findCredentialConfiguration(credentialConfigurationId);
         model.addAttribute("credentialConfiguration", credentialConfiguration);
         model.addAttribute("startIssuanceForm", new StartIssuanceForm(credentialConfiguration.jsonRequest(), credentialConfiguration.personIdentifier()));
         return "start";
@@ -99,7 +99,7 @@ public class StartIssuanceController {
     public String startIssuance(@PathVariable("credential_configuration_id") String credentialConfigurationId,
                                 @ModelAttribute("startIssuanceForm") StartIssuanceForm startIssuanceForm,
                                 Model model) {
-        CredentialConfiguration credentialConfiguration = properties.findCredentialConfiguration(credentialConfigurationId);
+        CredentialConfiguration credentialConfiguration = certificateService.findCredentialConfiguration(credentialConfigurationId);
         String normalizedJson = startIssuanceForm.json().replaceAll("\\s", ""); // TODO add validation
         logger.info(normalizedJson);
 
@@ -170,8 +170,8 @@ public class StartIssuanceController {
     public ModelAndView deleteCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId) {
         logger.info("Deleting credential with id {}", credentialConfigurationId);
 
-        properties.credentialConfigurations().removeIf(c -> c.credentialConfigurationId().equals(credentialConfigurationId));
-        return new ModelAndView("admin", "credential_configurations", properties.credentialConfigurations());
+        byobService.removeCustomCredentialDefinition(credentialConfigurationId);
+        return new ModelAndView("admin", "credential_configurations", certificateService.getCustomCredentialConfigurations());
     }
 
     private IssuanceRequest createRequestTraceing(StartIssuanceForm startIssuanceForm) {

@@ -21,4 +21,8 @@ public class ByobService {
     public CredentialDefinition getCustomCredentialDefinition(String key) {
         return customCredentialDefinitions.get(key);
     }
+
+    public boolean removeCustomCredentialDefinition(String key) {
+        return customCredentialDefinitions.remove(key) != null;
+    }
 }
