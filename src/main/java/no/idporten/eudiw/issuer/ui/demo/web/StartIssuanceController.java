@@ -8,6 +8,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import jakarta.validation.Valid;
+import no.idporten.eudiw.issuer.ui.demo.byob.ByobService;
 import no.idporten.eudiw.issuer.ui.demo.byob.CredentialDefinitionFactory;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import no.idporten.eudiw.issuer.ui.demo.config.BevisgeneratorProperties;
@@ -45,11 +46,14 @@ public class StartIssuanceController {
 
     private final BevisgeneratorProperties bevisgeneratorProperties;
 
+    private final ByobService byobService;
+
     @Autowired
-    public StartIssuanceController(IssuerServerService issuerServerService, IssuerServerProperties properties, BevisgeneratorProperties bevisgeneratorProperties) {
+    public StartIssuanceController(IssuerServerService issuerServerService, IssuerServerProperties properties, BevisgeneratorProperties bevisgeneratorProperties, ByobService byobService) {
         this.issuerServerService = issuerServerService;
         this.properties = properties;
         this.bevisgeneratorProperties = bevisgeneratorProperties;
+        this.byobService = byobService;
     }
 
     @ModelAttribute("issuerUrl")
@@ -135,10 +139,33 @@ public class StartIssuanceController {
 
         ObjectMapper mapper = new ObjectMapper();
         CredentialDefinition cd = mapper.readValue(addCredentialForm.json(), CredentialDefinition.class);
+        byobService.addCustomCredentialDefinition(addCredentialForm.vct(), cd);
 
         properties.credentialConfigurations().add(new CredentialConfiguration(addCredentialForm.vct(), "", "16903349844", addCredentialForm.vct(), addCredentialForm.json()));
 
         return new ModelAndView("redirect:/admin", "credential_configurations", properties.credentialConfigurations());
+    }
+
+    @GetMapping("/edit-credential/{credential_configuration_id}")
+    public ModelAndView editCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId) throws JsonProcessingException {
+        logger.info("Editing credential with id {}", credentialConfigurationId);
+
+        CredentialDefinition cd = byobService.getCustomCredentialDefinition(credentialConfigurationId);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(cd);
+
+        return new ModelAndView("add", "addCredentialForm", new AddCredentialForm(credentialConfigurationId, json));
+    }
+
+    @GetMapping("/delete-credential/{credential_configuration_id}")
+    public ModelAndView deleteCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId) {
+        logger.info("Deleting credential with id {}", credentialConfigurationId);
+
+        properties.credentialConfigurations().removeIf(c -> c.credentialConfigurationId().equals(credentialConfigurationId));
+        return new ModelAndView("admin", "credential_configurations", properties.credentialConfigurations());
     }
 
     private IssuanceRequest createRequestTraceing(StartIssuanceForm startIssuanceForm) {

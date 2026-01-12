@@ -22,7 +22,7 @@ public class CredentialDefinitionFactory {
                 ),
                 List.of(
                     new Claim(
-                        "family-name",
+                        "family_name",
                         true,
                         new Display(
                             "Etternavn",

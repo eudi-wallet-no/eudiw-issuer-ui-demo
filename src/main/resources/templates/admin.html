@@ -24,8 +24,13 @@
                 <li style="list-style-type: none; display: flex; justify-content: space-between; max-width: 700px;">
                     <p th:text="${cc.description()}">Navn</p>
                     <div style="display: flex; align-items: center; justify-content: center;">
-                        <button class="ds-button" data-size="sm" data-variant="tertiary">Rediger</button>
-                        <button class="ds-button" data-size="sm" data-variant="secondary" data-color="danger">Slett</button>
+                        <a th:href="@{/edit-credential/{id}(id=${cc.credentialConfigurationId})}" style="text-decoration: none">
+                            <button class="ds-button" data-size="sm" data-variant="tertiary">Rediger</button>
+                        </a>
+
+                        <a th:href="@{/delete-credential/{id}(id=${cc.credentialConfigurationId})}" style="text-decoration: none">
+                            <button class="ds-button" data-size="sm" data-variant="secondary" data-color="danger">Slett</button>
+                        </a>
                     </div>
                 </li>
             </th:block>

@@ -15,11 +15,13 @@ public record AddCredentialForm(
         String vct,
         String json
 ) {
-    public AddCredentialForm() {
-        this("", "");
-    }
 
     public AddCredentialForm(String json) {
         this("", json);
+    }
+
+    public AddCredentialForm(String vct, String json) {
+        this.vct = vct;
+        this.json = json;
     }
 }
