@@ -3,7 +3,7 @@ package no.idporten.eudiw.issuer.ui.demo.byob;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
-import no.idporten.eudiw.issuer.ui.demo.issuer.config.CredentialConfiguration;
+import no.idporten.eudiw.issuer.ui.demo.certificates.CertificateDto;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -31,17 +31,18 @@ public class ByobService {
         customCredentialDefinitions.remove(key);
     }
 
-    public List<CredentialConfiguration> getCredentialConfigurations() {
+    public List<CertificateDto> getCredentialConfigurations() {
         Collection<CredentialDefinition> credentialDefinitions = getCustomCredentialDefinitions().values();
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         return credentialDefinitions.stream().map(cd -> {
             try {
-                return new CredentialConfiguration(cd.getVct(), "", "16903349844", cd.getVct(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cd), false);
+                return new CertificateDto(cd.getVct(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cd));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }).toList();
     }
+
 }

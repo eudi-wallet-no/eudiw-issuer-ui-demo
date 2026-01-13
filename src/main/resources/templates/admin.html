@@ -66,17 +66,17 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="cc : ${credential_configurations}">
-                <td th:text="${cc.description()}">Navn</td>
+            <tr th:each="c : ${certificates}">
+                <td th:text="${c.name()}">Navn</td>
                 <td>
-                    <div class="actions" th:if="${!cc.readonly()}">
-                        <a th:href="@{/edit-credential/{id}(id=${cc.credentialConfigurationId})}">
+                    <div class="actions">
+                        <a th:href="@{/edit-credential/{id}(id=${c.cvt()})}">
                             <button class="ds-button" data-size="sm" data-variant="tertiary">
                                 Rediger
                             </button>
                         </a>
 
-                        <a th:href="@{/delete-credential/{id}(id=${cc.credentialConfigurationId})}">
+                        <a th:href="@{/delete-credential/{id}(id=${c.cvt})}">
                             <button class="ds-button" data-size="sm" data-variant="secondary" data-color="danger">
                                 Slett
                             </button>
