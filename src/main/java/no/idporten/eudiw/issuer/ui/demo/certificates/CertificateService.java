@@ -1,16 +1,13 @@
 package no.idporten.eudiw.issuer.ui.demo.certificates;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.idporten.eudiw.issuer.ui.demo.byob.ByobService;
-import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import no.idporten.eudiw.issuer.ui.demo.issuer.config.CredentialConfiguration;
 import no.idporten.eudiw.issuer.ui.demo.issuer.config.IssuerServerProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CertificateService {
@@ -25,44 +22,17 @@ public class CertificateService {
         this.credentialConfigurations.addAll(issuerServerProperties.credentialConfigurations());
     }
 
-    public ByobService getByobService() {
-        return byobService;
-    }
-
-    public IssuerServerProperties getIssuerServerProperties() {
-        return issuerServerProperties;
-    }
-
     public List<CredentialConfiguration> getAllCredentialsConfigurations() {
         List<CredentialConfiguration> result = new ArrayList<>();
         result.addAll(this.credentialConfigurations);
-        result.addAll(getCustomCredentialConfigurations());
+        //result.addAll(this.byobService.getCredentialConfigurations());
         return result;
     }
 
-    public List<CredentialConfiguration> getCustomCredentialConfigurations() {
-        Collection<CredentialDefinition> credentialDefinitions = this.byobService.getCustomCredentialDefinitions().values();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        return credentialDefinitions.stream().map(cd -> {
-            try {
-                return new CredentialConfiguration(cd.getVct(), "", "16903349844", cd.getVct(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cd), false);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
-    }
-
     public CredentialConfiguration findCredentialConfiguration(String credentialConfigurationId) {
-        CredentialConfiguration credentialConfiguration = issuerServerProperties.findCredentialConfiguration(credentialConfigurationId);
-        if (credentialConfiguration != null) {
-            return credentialConfiguration;
-        }
-
-        return getCustomCredentialConfigurations()
+        return getAllCredentialsConfigurations()
                 .stream()
-                .filter(cc -> cc.credentialConfigurationId().equals(credentialConfigurationId))
+                .filter(c -> Objects.equals(c.credentialConfigurationId(), credentialConfigurationId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown credential configuration id"));
     }
