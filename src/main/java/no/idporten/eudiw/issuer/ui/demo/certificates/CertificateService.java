@@ -6,7 +6,6 @@ import no.idporten.eudiw.issuer.ui.demo.byob.ByobService;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,7 +18,7 @@ public class CertificateService {
     }
 
     public List<CertificateDto> getCertificates() {
-        Collection<CredentialDefinition> credentialDefinitions = byobService.getCustomCredentialDefinitions().values();
+        List<CredentialDefinition> credentialDefinitions = byobService.getCustomCredentialDefinitions();
 
         ObjectMapper objectMapper = new ObjectMapper();
 

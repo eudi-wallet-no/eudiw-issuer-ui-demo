@@ -1,10 +1,18 @@
 package no.idporten.eudiw.issuer.ui.demo.byob.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CredentialDefinition {
+    @JsonProperty("credential_configuration_id")
+    private String credentialConfigurationId;
     private String vct;
-    private final String format = "sd-jwt";
+    private String format;
+
+    @JsonProperty("example_credential_data")
     private ExampleCredentialData exampleCredentialData;
+
+    @JsonProperty("credential_metadata")
     private CredentialMetadata credentialMetadata;
 
     public CredentialDefinition() {}
@@ -13,6 +21,7 @@ public class CredentialDefinition {
         this.vct = vct;
         this.exampleCredentialData = exampleCredentialData;
         this.credentialMetadata = credentialMetadata;
+        this.format = "dc+sd-jwt";
     }
 
     public String getVct() {

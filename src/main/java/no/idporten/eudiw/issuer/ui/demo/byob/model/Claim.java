@@ -1,10 +1,12 @@
 package no.idporten.eudiw.issuer.ui.demo.byob.model;
 
 
+import java.util.List;
+
 public record Claim(
         String path,
         Boolean mandatory,
-        Display display
+        List<Display> display
 ) {
     public Claim {
         if (mandatory == null) {

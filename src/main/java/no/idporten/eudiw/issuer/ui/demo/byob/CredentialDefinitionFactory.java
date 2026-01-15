@@ -14,7 +14,7 @@ public class CredentialDefinitionFactory {
             new CredentialMetadata(
                 List.of(
                     new Display(
-                        "",
+                        "test",
                         "no",
                         null,
                         null
@@ -24,23 +24,26 @@ public class CredentialDefinitionFactory {
                     new Claim(
                         "family_name",
                         true,
-                        new Display(
-                            "Etternavn",
-                            "no",
-                            null,
-                            null
-                        )
-                    ),
-                        new Claim(
-                            "given_name",
-                            true,
+                        List.of(
                             new Display(
-                                "Fornavn",
+                                "Etternavn",
                                 "no",
                                 null,
                                 null
                             )
                         )
+                    ),
+                        new Claim(
+                            "given_name",
+                            true,
+                            List.of(new Display(
+                                "Fornavn",
+                                "no",
+                                null,
+                                null
+                           )
+                        )
+                    )
                 )
             )
         );
