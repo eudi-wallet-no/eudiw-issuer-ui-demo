@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,16 +48,7 @@ public class ByobService {
     }
 
     public void removeCustomCredentialDefinition(String vct) {
-        String endpoint = byobServiceProperties.findEndpoint();
-
-        try {
-            restClient
-                .delete()
-                .uri(endpoint + "{vct}", vct)
-                .accept(MediaType.APPLICATION_JSON);
-        } catch (RestClientResponseException e) {
-            throw new ByobServiceException("Configuration error against byob-service? path=" + endpoint, e);
-        }
+        deleteCredentialDefinition(vct);
     }
 
     public List<CredentialDefinition> getCredentialConfigurations() {
@@ -66,13 +60,14 @@ public class ByobService {
     }
 
     private CredentialDefinition getDefinitionByCvt(String vct) {
-       String endpoint = byobServiceProperties.findEndpoint();
+        String endpoint = byobServiceProperties.findEndpoint();
+        URI fullEndpoint = URI.create(endpoint + URLEncoder.encode(vct, StandardCharsets.UTF_8));
 
         CredentialDefinition result;
         try {
             result = restClient
                     .get()
-                    .uri(endpoint + "{vct}", vct)
+                    .uri(fullEndpoint)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .body(CredentialDefinition.class);
@@ -116,6 +111,20 @@ public class ByobService {
                     .body(CredentialDefinition.class);
         } catch (RestClientResponseException e) {
             throw new ByobServiceException("Configuration error against byob-service? path=" + persistEndpoint, e);
+        }
+    }
+
+    private void deleteCredentialDefinition(String vct) {
+        String endpoint = byobServiceProperties.findEndpoint();
+        URI fullEndpoint = URI.create(endpoint + URLEncoder.encode(vct, StandardCharsets.UTF_8));
+
+        try {
+            restClient
+                    .delete()
+                    .uri(fullEndpoint)
+                    .accept(MediaType.APPLICATION_JSON);
+        } catch (RestClientResponseException e) {
+            throw new ByobServiceException("Configuration error against byob-service? path=" + endpoint, e);
         }
     }
 }
