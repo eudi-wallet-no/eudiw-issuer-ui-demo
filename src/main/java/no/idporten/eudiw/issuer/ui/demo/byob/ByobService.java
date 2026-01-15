@@ -40,18 +40,18 @@ public class ByobService {
         return storeCertificate(credentialDefinition);
     }
 
-    public CredentialDefinition getCredentialDefinitionByCvt(String cvt) {
-        return getDefinitionByCvt(cvt);
+    public CredentialDefinition getCredentialDefinitionByVct(String vct) {
+        return getDefinitionByCvt(vct);
     }
 
-    public void removeCustomCredentialDefinition(String key) {
+    public void removeCustomCredentialDefinition(String vct) {
         String endpoint = byobServiceProperties.findEndpoint();
 
         try {
             restClient
                 .delete()
-                .uri(endpoint)
-                .accept(MediaType.APPLICATION_JSON); // TODO: Finish
+                .uri(endpoint + "{vct}", vct)
+                .accept(MediaType.APPLICATION_JSON);
         } catch (RestClientResponseException e) {
             throw new ByobServiceException("Configuration error against byob-service? path=" + endpoint, e);
         }

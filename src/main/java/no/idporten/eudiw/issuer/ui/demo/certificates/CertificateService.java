@@ -30,7 +30,7 @@ public class CertificateService {
     }
 
     public CertificateDto findCertificate(String cvt) throws JsonProcessingException {
-        CredentialDefinition cd = byobService.getCredentialDefinitionByCvt(cvt);
+        CredentialDefinition cd = byobService.getCredentialDefinitionByVct(cvt);
         return mapper.toDto(cd);
     }
 

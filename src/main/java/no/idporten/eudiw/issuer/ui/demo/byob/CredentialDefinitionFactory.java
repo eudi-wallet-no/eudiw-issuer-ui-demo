@@ -10,7 +10,10 @@ public class CredentialDefinitionFactory {
     public static CredentialDefinition empty() {
         return new CredentialDefinition(
             "eidas2.[your-certificate-name].123",
-            new ExampleCredentialData(Map.of("family-name", "Normann", "given-name", "Kari")),
+            List.of(
+                new ExampleCredentialData("family-name", "Normann"),
+                new ExampleCredentialData("given-name", "Kari")
+            ),
             new CredentialMetadata(
                 List.of(
                     new Display(

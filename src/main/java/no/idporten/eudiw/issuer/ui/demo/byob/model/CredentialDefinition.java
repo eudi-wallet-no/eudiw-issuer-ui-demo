@@ -3,6 +3,8 @@ package no.idporten.eudiw.issuer.ui.demo.byob.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public class CredentialDefinition {
     @JsonProperty("credential_configuration_id")
     private String credentialConfigurationId;
@@ -10,14 +12,14 @@ public class CredentialDefinition {
     private String format;
 
     @JsonProperty("example_credential_data")
-    private ExampleCredentialData exampleCredentialData;
+    private List<ExampleCredentialData> exampleCredentialData;
 
     @JsonProperty("credential_metadata")
     private CredentialMetadata credentialMetadata;
 
     public CredentialDefinition() {}
 
-    public CredentialDefinition(String vct, ExampleCredentialData exampleCredentialData, CredentialMetadata credentialMetadata) {
+    public CredentialDefinition(String vct, List<ExampleCredentialData> exampleCredentialData, CredentialMetadata credentialMetadata) {
         this.vct = vct;
         this.exampleCredentialData = exampleCredentialData;
         this.credentialMetadata = credentialMetadata;
@@ -36,11 +38,11 @@ public class CredentialDefinition {
         return format;
     }
 
-    public ExampleCredentialData getExampleCredentialData() {
+    public List<ExampleCredentialData> getExampleCredentialData() {
         return exampleCredentialData;
     }
 
-    public void setExampleCredentialData(ExampleCredentialData exampleCredentialData) {
+    public void setExampleCredentialData(List<ExampleCredentialData> exampleCredentialData) {
         this.exampleCredentialData = exampleCredentialData;
     }
 

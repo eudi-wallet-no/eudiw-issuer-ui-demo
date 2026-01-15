@@ -5,7 +5,7 @@ spring:
 
 bevisgenerator:
   issuer-server:
-    base-url: https://utsteder.eidas2sandkasse.dev
+    base-url: https://byob-service.eidas2sandkasse.dev
 
 maskinporten:
   lib:
