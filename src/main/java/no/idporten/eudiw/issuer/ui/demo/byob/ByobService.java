@@ -61,6 +61,10 @@ public class ByobService {
         return  getCustomCredentialDefinitions();
     }
 
+    public boolean existsByVct(String vct) {
+        return getCustomCredentialDefinitions().stream().anyMatch(c -> c.getVct().equals(vct));
+    }
+
     private CredentialDefinition getDefinitionByCvt(String vct) {
        String endpoint = byobServiceProperties.findEndpoint();
 

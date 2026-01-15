@@ -3,6 +3,7 @@ package no.idporten.eudiw.issuer.ui.demo.web;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import no.idporten.eudiw.issuer.ui.demo.certificates.unique.UniqueVct;
 
 
 public record AddCredentialForm(
@@ -13,6 +14,7 @@ public record AddCredentialForm(
                 regexp = "^[a-z0-9_:]{3,155}",
                 message = "VCT kan kun bestå av små bokstaver, tall, kolon og understrek.\n Lengde: 3-155 tegn"
         )
+        @UniqueVct()
         String vct,
         String json
 ) {
