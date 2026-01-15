@@ -6,21 +6,23 @@ import jakarta.validation.constraints.Pattern;
 
 
 public record AddCredentialForm(
+        String id,
 
         @NotBlank(message = "VCT er påkrevd")
         @Pattern(
                 regexp = "^[a-z0-9_:]{3,155}",
-                message = "VCT kan kun bestå av små bokstaver, tall og kolon - 3-155 tegn"
+                message = "VCT kan kun bestå av små bokstaver, tall, kolon og understrek.\n Lengde: 3-155 tegn"
         )
         String vct,
         String json
 ) {
 
     public AddCredentialForm(String json) {
-        this("", json);
+        this("","", json);
     }
 
-    public AddCredentialForm(String vct, String json) {
+    public AddCredentialForm(String id, String vct, String json) {
+        this.id = id;
         this.vct = vct;
         this.json = json;
     }

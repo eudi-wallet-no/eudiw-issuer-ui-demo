@@ -1,7 +1,16 @@
 package no.idporten.eudiw.issuer.ui.demo.certificates;
 
-public record CertificateDto(String cvt, String name, String json) {
-     public CertificateDto(String cvt, String json) {
-         this(cvt, cvt, json);
-     }
+
+public record CertificateDto(String vct, String name, String json) {
+    public CertificateDto {
+        name = name == null ? cleanVct(vct) : name;
+    }
+
+    public CertificateDto(String vct, String json) {
+        this(vct, null, json);
+    }
+
+    private static String cleanVct(String vct) {
+        return vct.replaceFirst("^[^:]+:", "");
+    }
 }

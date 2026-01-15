@@ -60,7 +60,7 @@ public class AdminController {
     public ModelAndView editCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId) throws JsonProcessingException {
         logger.info("Editing credential with id {}", credentialConfigurationId);
         CertificateDto cd = certificateService.findCertificate(credentialConfigurationId);
-        return new ModelAndView("add", "addCredentialForm", new AddCredentialForm(credentialConfigurationId, cd.json()));
+        return new ModelAndView("add", "addCredentialForm", new AddCredentialForm(credentialConfigurationId, cd.name(), cd.json()));
     }
 
     @GetMapping("/delete-credential/{credential_configuration_id}")

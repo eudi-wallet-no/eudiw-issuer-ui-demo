@@ -1,13 +1,8 @@
 package no.idporten.eudiw.issuer.ui.demo.byob;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinitionCollection;
-import no.idporten.eudiw.issuer.ui.demo.certificates.CertificateDto;
 import no.idporten.eudiw.issuer.ui.demo.exception.ByobServiceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -15,62 +10,76 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ByobService {
     private final ByobServiceProperties byobServiceProperties;
-    private final ObjectMapper objectMapper;
     private final RestClient restClient;
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-   private final Map<String, CredentialDefinition> customCredentialDefinitions = new HashMap<>();
 
    @Autowired
     public ByobService(
             ByobServiceProperties byobServiceProperties,
-            ObjectMapper objectMapper,
             @Qualifier("byobServiceRestClient")
             RestClient restClient
    ) {
         this.byobServiceProperties = byobServiceProperties;
-        this.objectMapper = objectMapper;
         this.restClient = restClient;
    }
 
     public List<CredentialDefinition> getCustomCredentialDefinitions() {
-        List<CredentialDefinition> result = getCertificateDefinitions().credentialConfigurations;
+        List<CredentialDefinition> result = getCertificationDefinitionCollection().credentialConfigurations;
         if (result == null) {
             result = new ArrayList<>();
         }
         return result;
     }
 
-    public CredentialDefinition addCustomCredentialDefinition(CredentialDefinition credentialDefinition) {
+    public CredentialDefinition addCredentialDefinition(CredentialDefinition credentialDefinition) {
         return storeCertificate(credentialDefinition);
     }
 
-    public CredentialDefinition getCustomCredentialDefinition(String key) {
-        return customCredentialDefinitions.get(key);
+    public CredentialDefinition getCredentialDefinitionByCvt(String cvt) {
+        return getDefinitionByCvt(cvt);
     }
 
     public void removeCustomCredentialDefinition(String key) {
-        customCredentialDefinitions.remove(key);
+        String endpoint = byobServiceProperties.findEndpoint();
+
+        try {
+            restClient
+                .delete()
+                .uri(endpoint)
+                .accept(MediaType.APPLICATION_JSON); // TODO: Finish
+        } catch (RestClientResponseException e) {
+            throw new ByobServiceException("Configuration error against byob-service? path=" + endpoint, e);
+        }
     }
 
-    public List<CertificateDto> getCredentialConfigurations() {
-        Collection<CredentialDefinition> credentialDefinitions = getCustomCredentialDefinitions();
-
-        return credentialDefinitions.stream().map(cd -> {
-            try {
-                return new CertificateDto(cd.getVct(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cd));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
+    public List<CredentialDefinition> getCredentialConfigurations() {
+        return  getCustomCredentialDefinitions();
     }
 
-    private CredentialDefinitionCollection getCertificateDefinitions() {
+    private CredentialDefinition getDefinitionByCvt(String vct) {
+       String endpoint = byobServiceProperties.findEndpoint();
+
+        CredentialDefinition result;
+        try {
+            result = restClient
+                    .get()
+                    .uri(endpoint + "{vct}", vct)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .body(CredentialDefinition.class);
+        } catch (RestClientResponseException e) {
+            throw new ByobServiceException("Configuration error against byob-service? path=" + endpoint, e);
+        }
+
+        return result;
+    }
+
+    private CredentialDefinitionCollection getCertificationDefinitionCollection() {
        String getEndpoint = byobServiceProperties.getEndpoint();
 
        CredentialDefinitionCollection result;

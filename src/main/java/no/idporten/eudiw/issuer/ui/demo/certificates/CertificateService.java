@@ -1,50 +1,44 @@
 package no.idporten.eudiw.issuer.ui.demo.certificates;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.idporten.eudiw.issuer.ui.demo.byob.ByobService;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class CertificateService {
     private final ByobService byobService;
+    private final CredentialMapper mapper;
 
-    public CertificateService(ByobService byobService) {
+    public CertificateService(ByobService byobService, CredentialMapper mapper) {
         this.byobService = byobService;
+        this.mapper = mapper;
     }
 
     public List<CertificateDto> getCertificates() {
         List<CredentialDefinition> credentialDefinitions = byobService.getCustomCredentialDefinitions();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
         return credentialDefinitions.stream().map(cd -> {
             try {
-                return new CertificateDto(cd.getVct(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cd));
+                return mapper.toDto(cd);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }).toList();
     }
 
-    public CertificateDto findCertificate(String cvt) {
-        return getCertificates()
-                .stream()
-                .filter(c -> Objects.equals(c.cvt(), cvt))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown credential configuration id"));
+    public CertificateDto findCertificate(String cvt) throws JsonProcessingException {
+        CredentialDefinition cd = byobService.getCredentialDefinitionByCvt(cvt);
+        return mapper.toDto(cd);
     }
 
     public void storeCertificate(CertificateDto certificateDto) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        CredentialDefinition cd = mapper.readValue(certificateDto.json(), CredentialDefinition.class);
+        CredentialDefinition cd =  mapper.fromDto(certificateDto);
 
-        cd.setVct(certificateDto.cvt());
-        byobService.addCustomCredentialDefinition(cd);
+        cd.setVct(certificateDto.vct());
+        byobService.addCredentialDefinition(cd);
     }
 
     public void deleteCertificate(String cvt) {
