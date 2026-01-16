@@ -38,7 +38,7 @@ public class ByobService {
     }
 
     public CredentialDefinition addCredentialDefinition(CredentialDefinition credentialDefinition) {
-        return storeCertificate(credentialDefinition);
+        return storeCredential(credentialDefinition);
     }
 
     public CredentialDefinition getCredentialDefinitionByVct(String vct) {
@@ -95,7 +95,7 @@ public class ByobService {
        return result;
     }
 
-    private CredentialDefinition storeCertificate(CredentialDefinition cd) {
+    private CredentialDefinition storeCredential(CredentialDefinition cd) {
         String persistEndpoint = byobServiceProperties.createEndpoint();
 
         try {

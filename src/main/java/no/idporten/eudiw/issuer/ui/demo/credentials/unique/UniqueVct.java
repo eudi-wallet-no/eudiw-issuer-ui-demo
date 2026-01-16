@@ -1,4 +1,4 @@
-package no.idporten.eudiw.issuer.ui.demo.certificates.unique;
+package no.idporten.eudiw.issuer.ui.demo.credentials.unique;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

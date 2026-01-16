@@ -3,7 +3,7 @@ package no.idporten.eudiw.issuer.ui.demo.web;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import no.idporten.eudiw.issuer.ui.demo.certificates.unique.UniqueVct;
+import no.idporten.eudiw.issuer.ui.demo.credentials.unique.UniqueVct;
 
 
 public record AddCredentialForm(

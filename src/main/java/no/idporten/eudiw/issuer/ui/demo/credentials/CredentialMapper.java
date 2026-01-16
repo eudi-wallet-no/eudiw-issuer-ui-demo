@@ -1,4 +1,4 @@
-package no.idporten.eudiw.issuer.ui.demo.certificates;
+package no.idporten.eudiw.issuer.ui.demo.credentials;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,11 +14,11 @@ public class CredentialMapper {
         this.objectMapper = objectMapper;
     }
 
-    public CertificateDto toDto(CredentialDefinition cd) throws JsonProcessingException {
-        return new CertificateDto(cd.getVct(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cd));
+    public CredentialDto toDto(CredentialDefinition cd) throws JsonProcessingException {
+        return new CredentialDto(cd.getVct(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cd));
     }
 
-    public CredentialDefinition fromDto(CertificateDto dto) throws JsonProcessingException {
+    public CredentialDefinition fromDto(CredentialDto dto) throws JsonProcessingException {
         return objectMapper.readValue(dto.json(), CredentialDefinition.class);
     }
 }

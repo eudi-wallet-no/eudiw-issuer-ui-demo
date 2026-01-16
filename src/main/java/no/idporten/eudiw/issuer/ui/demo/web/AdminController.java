@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import no.idporten.eudiw.issuer.ui.demo.byob.CredentialDefinitionFactory;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
-import no.idporten.eudiw.issuer.ui.demo.certificates.CertificateDto;
-import no.idporten.eudiw.issuer.ui.demo.certificates.CertificateService;
+import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialDto;
+import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -20,16 +20,16 @@ import org.springframework.web.servlet.ModelAndView;
 public class AdminController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final CertificateService certificateService;
+    private final CredentialService credentialService;
 
-    public AdminController(CertificateService certificateService) {
-        this.certificateService = certificateService;
+    public AdminController(CredentialService credentialService) {
+        this.credentialService = credentialService;
     }
 
 
     @GetMapping("/admin")
     public ModelAndView admin() {
-        return new ModelAndView("admin", "certificates", certificateService.getCertificates());
+        return new ModelAndView("admin", "credentials", credentialService.getCredentials());
     }
 
     @GetMapping("/add-credential")
@@ -51,15 +51,15 @@ public class AdminController {
             return new ModelAndView("add", "addCredentialForm", addCredentialForm);
         }
 
-        certificateService.storeCertificate(new CertificateDto(addCredentialForm.vct(), addCredentialForm.json()));
+        credentialService.storeCredential(new CredentialDto(addCredentialForm.vct(), addCredentialForm.json()));
 
-        return new ModelAndView("redirect:/admin", "certificates", certificateService.getCertificates());
+        return new ModelAndView("redirect:/admin", "credentials", credentialService.getCredentials());
     }
 
     @GetMapping("/edit-credential/{credential_configuration_id}")
     public ModelAndView editCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId) throws JsonProcessingException {
         logger.info("Editing credential with id {}", credentialConfigurationId);
-        CertificateDto cd = certificateService.findCertificate(credentialConfigurationId);
+        CredentialDto cd = credentialService.findCredential(credentialConfigurationId);
         return new ModelAndView("add", "addCredentialForm", new AddCredentialForm(credentialConfigurationId, cd.name(), cd.json()));
     }
 
@@ -67,7 +67,7 @@ public class AdminController {
     public ModelAndView deleteCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId) {
         logger.info("Deleting credential with id {}", credentialConfigurationId);
 
-        certificateService.deleteCertificate(credentialConfigurationId);
-        return new ModelAndView("redirect:/admin", "certificates", certificateService.getCertificates());
+        credentialService.deleteCredential(credentialConfigurationId);
+        return new ModelAndView("redirect:/admin", "credentials", credentialService.getCredentials());
     }
 }

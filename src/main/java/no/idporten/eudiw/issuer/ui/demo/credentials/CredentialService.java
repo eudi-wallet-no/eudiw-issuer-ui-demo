@@ -1,4 +1,4 @@
-package no.idporten.eudiw.issuer.ui.demo.certificates;
+package no.idporten.eudiw.issuer.ui.demo.credentials;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.idporten.eudiw.issuer.ui.demo.byob.ByobService;
@@ -8,16 +8,16 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CertificateService {
+public class CredentialService {
     private final ByobService byobService;
     private final CredentialMapper mapper;
 
-    public CertificateService(ByobService byobService, CredentialMapper mapper) {
+    public CredentialService(ByobService byobService, CredentialMapper mapper) {
         this.byobService = byobService;
         this.mapper = mapper;
     }
 
-    public List<CertificateDto> getCertificates() {
+    public List<CredentialDto> getCredentials() {
         List<CredentialDefinition> credentialDefinitions = byobService.getCustomCredentialDefinitions();
 
         return credentialDefinitions.stream().map(cd -> {
@@ -29,19 +29,19 @@ public class CertificateService {
         }).toList();
     }
 
-    public CertificateDto findCertificate(String cvt) throws JsonProcessingException {
+    public CredentialDto findCredential(String cvt) throws JsonProcessingException {
         CredentialDefinition cd = byobService.getCredentialDefinitionByVct(cvt);
         return mapper.toDto(cd);
     }
 
-    public void storeCertificate(CertificateDto certificateDto) throws JsonProcessingException {
-        CredentialDefinition cd =  mapper.fromDto(certificateDto);
+    public void storeCredential(CredentialDto dto) throws JsonProcessingException {
+        CredentialDefinition cd =  mapper.fromDto(dto);
 
-        cd.setVct(certificateDto.vct());
+        cd.setVct(dto.vct());
         byobService.addCredentialDefinition(cd);
     }
 
-    public void deleteCertificate(String cvt) {
+    public void deleteCredential(String cvt) {
         byobService.removeCustomCredentialDefinition(cvt);
     }
 }
