@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -57,7 +58,11 @@ public class ByobService {
         return getCustomCredentialDefinitions().stream().anyMatch(c -> c.getVct().equals(vct));
     }
 
-    private CredentialDefinition getDefinitionByCvt(String vct) {
+    public CredentialDefinition editCredentialDefinition(CredentialDefinition cd) {
+       return putCredentialDefinition(cd);
+    }
+
+     private CredentialDefinition getDefinitionByCvt(String vct) {
         String endpoint = byobServiceProperties.getEndpoint();
         URI uri = URI.create(endpoint + "/" + vct);
 
@@ -109,6 +114,25 @@ public class ByobService {
                     .body(CredentialDefinition.class);
         } catch (RestClientResponseException e) {
             throw new ByobServiceException("Configuration error against byob-service? path=" + persistEndpoint, e);
+        }
+    }
+
+    private CredentialDefinition putCredentialDefinition(CredentialDefinition cd) {
+        String endpoint = byobServiceProperties.getEndpoint();
+        URI uri = UriComponentsBuilder.fromUriString(endpoint).build().toUri();
+
+        try {
+            return restClient
+                    .put()
+                    .uri(uri)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(cd)
+                    .retrieve()
+                    .body(CredentialDefinition.class);
+        }
+        catch (RestClientResponseException e) {
+            throw new ByobServiceException(e.getMessage(), e);
         }
     }
 

@@ -44,4 +44,11 @@ public class CredentialService {
     public void deleteCredential(String cvt) {
         byobService.removeCustomCredentialDefinition(cvt);
     }
+
+    public void editCredential(CredentialDto dto) throws JsonProcessingException {
+        CredentialDefinition cd =  mapper.fromDto(dto);
+
+        cd.setVct(dto.vct());
+        byobService.editCredentialDefinition(cd);
+    }
 }
