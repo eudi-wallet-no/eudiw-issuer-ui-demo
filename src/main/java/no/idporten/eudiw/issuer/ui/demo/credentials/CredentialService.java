@@ -18,7 +18,7 @@ public class CredentialService {
     }
 
     public List<CredentialDto> getCredentials() {
-        List<CredentialDefinition> credentialDefinitions = byobService.getCustomCredentialDefinitions();
+        List<CredentialDefinition> credentialDefinitions = byobService.getCredentialConfigurations();
 
         return credentialDefinitions.stream().map(cd -> {
             try {
