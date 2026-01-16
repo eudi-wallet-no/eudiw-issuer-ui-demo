@@ -9,7 +9,7 @@ public class CredentialDefinitionFactory {
 
     public static CredentialDefinition empty() {
         return new CredentialDefinition(
-            "eidas2.[your-certificate-name].123",
+            "your-credential-configuration-name (automatically generated)",
             List.of(
                 new ExampleCredentialData("family-name", "Normann"),
                 new ExampleCredentialData("given-name", "Kari")
