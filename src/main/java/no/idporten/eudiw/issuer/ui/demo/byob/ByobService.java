@@ -11,8 +11,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,14 +58,14 @@ public class ByobService {
     }
 
     private CredentialDefinition getDefinitionByCvt(String vct) {
-        String endpoint = byobServiceProperties.findEndpoint();
-        URI fullEndpoint = URI.create(endpoint + URLEncoder.encode(vct, StandardCharsets.UTF_8));
+        String endpoint = byobServiceProperties.getEndpoint();
+        URI uri = URI.create(endpoint + "/" + vct);
 
         CredentialDefinition result;
         try {
             result = restClient
                     .get()
-                    .uri(fullEndpoint)
+                    .uri(uri)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .body(CredentialDefinition.class);
@@ -79,7 +77,7 @@ public class ByobService {
     }
 
     private CredentialDefinitionCollection getCertificationDefinitionCollection() {
-       String getEndpoint = byobServiceProperties.getEndpoint();
+       String getEndpoint = byobServiceProperties.getManyEndpoint();
 
        CredentialDefinitionCollection result;
 
@@ -115,14 +113,16 @@ public class ByobService {
     }
 
     private void deleteCredentialDefinition(String vct) {
-        String endpoint = byobServiceProperties.findEndpoint();
-        URI fullEndpoint = URI.create(endpoint + URLEncoder.encode(vct, StandardCharsets.UTF_8));
+        String endpoint = byobServiceProperties.getEndpoint();
+        URI uri = URI.create(endpoint + "?vct=" + vct);
 
         try {
             restClient
                     .delete()
-                    .uri(fullEndpoint)
-                    .accept(MediaType.APPLICATION_JSON);
+                    .uri(uri)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
         } catch (RestClientResponseException e) {
             throw new ByobServiceException("Configuration error against byob-service? path=" + endpoint, e);
         }

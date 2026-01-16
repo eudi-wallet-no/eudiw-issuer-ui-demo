@@ -34,8 +34,8 @@ bevisgenerator:
     allow-create-bevistyper: true
   byob-service:
     create-endpoint: /v1/credential-configuration
-    get-endpoint: /v1/credential-configurations
-    find-endpoint: /v1/credential-configuration/
+    get-many-endpoint: /v1/credential-configurations
+    get-endpoint: /v1/credential-configuration
     search-endpoint: /v1/credential-configuration/search
   issuer-server:
     issuance-endpoint: /api/v1/credential/issuance-transaction
