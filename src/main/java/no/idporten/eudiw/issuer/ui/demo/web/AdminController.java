@@ -47,7 +47,7 @@ public class AdminController {
     @PostMapping("/add-credential")
     public ModelAndView addNewCredential(@Valid AddCredentialForm addCredentialForm, BindingResult bindingResult) throws JsonProcessingException {
         if (bindingResult.hasErrors()) {
-            System.out.println("BindingResult errors: " + bindingResult.getAllErrors());
+            logger.error("BindingResult errors: {}", bindingResult.getAllErrors());
             return new ModelAndView("add", "addCredentialForm", addCredentialForm);
         }
 
