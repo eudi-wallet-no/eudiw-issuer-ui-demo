@@ -34,6 +34,10 @@ public class CredentialDefinition {
         this.vct = vct;
     }
 
+    public String getCredentialConfigurationId() {
+        return credentialConfigurationId;
+    }
+
     public String getFormat() {
         return format;
     }

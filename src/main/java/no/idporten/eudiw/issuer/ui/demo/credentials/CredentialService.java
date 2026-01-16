@@ -18,7 +18,7 @@ public class CredentialService {
     }
 
     public List<CredentialDto> getCredentials() {
-        List<CredentialDefinition> credentialDefinitions = byobService.getCredentialConfigurations();
+        List<CredentialDefinition> credentialDefinitions = byobService.getCredentialDefinitions();
 
         return credentialDefinitions.stream().map(cd -> {
             try {
@@ -30,7 +30,7 @@ public class CredentialService {
     }
 
     public CredentialDto findCredential(String cvt) throws JsonProcessingException {
-        CredentialDefinition cd = byobService.getCredentialDefinitionByVct(cvt);
+        CredentialDefinition cd = byobService.getByVct(cvt);
         return mapper.toDto(cd);
     }
 
