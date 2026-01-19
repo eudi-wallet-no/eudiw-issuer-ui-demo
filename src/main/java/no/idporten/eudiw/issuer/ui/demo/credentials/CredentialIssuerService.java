@@ -6,6 +6,7 @@ import no.idporten.eudiw.issuer.ui.demo.byob.ByobService;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.Display;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.ExampleCredentialData;
+import no.idporten.eudiw.issuer.ui.demo.exception.IssuerUiException;
 import no.idporten.eudiw.issuer.ui.demo.issuer.config.CredentialConfiguration;
 import no.idporten.eudiw.issuer.ui.demo.issuer.model.IssuanceClaim;
 import no.idporten.eudiw.issuer.ui.demo.issuer.model.IssuanceDefinition;
@@ -18,22 +19,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CredentialIsserService {
+public class CredentialIssuerService {
     private final ByobService byobService;
     private final ObjectMapper objectMapper;
-    private final Logger log  = LoggerFactory.getLogger(CredentialIsserService.class);
+    private final Logger log  = LoggerFactory.getLogger(CredentialIssuerService.class);
 
     @Autowired
-    public CredentialIsserService(ByobService byobService, ObjectMapper objectMapper) {
+    public CredentialIssuerService(ByobService byobService, ObjectMapper objectMapper) {
         this.byobService = byobService;
         this.objectMapper = objectMapper;
     }
 
-    public List<CredentialConfiguration> getCredentialConfigurations() throws JsonProcessingException {
+    public List<CredentialConfiguration> getCredentialConfigurations() {
        return getCustomCredentials();
     }
 
-    public CredentialConfiguration getCredentialConfigurationById(String id) throws JsonProcessingException {
+    public CredentialConfiguration getCredentialConfigurationById(String id) {
         CredentialDefinition cd = byobService.getByCredentialConfigurationId(id);
         return convertCredentialDefinitionCredentials(cd);
     }
@@ -41,19 +42,17 @@ public class CredentialIsserService {
     private List<CredentialConfiguration> getCustomCredentials() {
         return byobService.getCredentialDefinitions()
                 .stream()
-                .map(cd -> {
-                    try {
-                        return convertCredentialDefinitionCredentials(cd);
-                    } catch (JsonProcessingException e) {
-                        log.warn(e.getMessage());
-                        return null;
-                    }
-                }).toList();
+                .map(this::convertCredentialDefinitionCredentials)
+                .toList();
     }
 
-    private CredentialConfiguration convertCredentialDefinitionCredentials(CredentialDefinition cd) throws JsonProcessingException {
-        IssuanceDefinition data = convertFromCredentialDefinitionToIssuanceDefinition(cd);
-        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data);
+    private CredentialConfiguration convertCredentialDefinitionCredentials(CredentialDefinition cd) {
+
+        // TODO: Hent personIdentifier fra application.yaml
+        String personIdentifier = "50917500484";
+
+        IssuanceDefinition data = convertFromCredentialDefinitionToIssuanceDefinition(cd, personIdentifier);
+        String json = convertToJson(data);
 
         String description = getDescription(cd);
 
@@ -63,7 +62,7 @@ public class CredentialIsserService {
         return new CredentialConfiguration(
                 cd.getCredentialConfigurationId(),
                 scope,
-                "50917500484",
+                personIdentifier,
                 description,
                 json
         );
@@ -79,8 +78,8 @@ public class CredentialIsserService {
             .orElse("Navn ikke funnet");
     }
 
-    private IssuanceDefinition convertFromCredentialDefinitionToIssuanceDefinition(CredentialDefinition cd) {
-        return new IssuanceDefinition(cd.getCredentialConfigurationId(), convertFromExampleDataToIssuanceClaim(cd));
+    private IssuanceDefinition convertFromCredentialDefinitionToIssuanceDefinition(CredentialDefinition cd, String personId) {
+        return new IssuanceDefinition(cd.getCredentialConfigurationId(), personId, convertFromExampleDataToIssuanceClaim(cd));
     }
 
     private List<IssuanceClaim> convertFromExampleDataToIssuanceClaim(CredentialDefinition cd) {
@@ -91,5 +90,14 @@ public class CredentialIsserService {
         }
 
         return issuanceClaims;
+    }
+
+    private String convertToJson(IssuanceDefinition issuanceDefinition) {
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(issuanceDefinition);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to parse issuanceDefinition: {}",issuanceDefinition,e);
+            throw new IssuerUiException("Failed to parse issuanceDefinition",e);
+        }
     }
 }

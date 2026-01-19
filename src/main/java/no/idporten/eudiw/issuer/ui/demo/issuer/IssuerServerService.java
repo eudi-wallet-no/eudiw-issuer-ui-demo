@@ -1,7 +1,7 @@
 package no.idporten.eudiw.issuer.ui.demo.issuer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialIsserService;
+import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialIssuerService;
 import no.idporten.eudiw.issuer.ui.demo.exception.IssuerServerException;
 import no.idporten.eudiw.issuer.ui.demo.exception.IssuerUiException;
 import no.idporten.eudiw.issuer.ui.demo.issuer.config.CredentialConfiguration;
@@ -32,32 +32,32 @@ public class IssuerServerService {
     private final IssuerServerProperties issuerServerProperties;
     private final RestClient restClient;
     private final MaskinportenClient maskinportenClient;
-    private final CredentialIsserService credentialIsserService;
+    private final CredentialIssuerService credentialIssuerService;
 
     @Autowired
     public IssuerServerService(@Qualifier("issuerServerRestClient") RestClient restClient,
                                IssuerServerProperties issuerServerProperties,
-                               MaskinportenClient maskinportenClient, CredentialIsserService credentialIsserService) {
+                               MaskinportenClient maskinportenClient, CredentialIssuerService credentialIssuerService) {
         this.issuerServerProperties = issuerServerProperties;
         this.restClient = restClient;
         this.maskinportenClient = maskinportenClient;
-        this.credentialIsserService = credentialIsserService;
+        this.credentialIssuerService = credentialIssuerService;
     }
 
-    public List<CredentialConfiguration> getAll() throws JsonProcessingException {
+    public List<CredentialConfiguration> getAll() {
         ArrayList<CredentialConfiguration> credentialConfigurations = new ArrayList<>(issuerServerProperties.credentialConfigurations());
-        credentialConfigurations.addAll(credentialIsserService.getCredentialConfigurations());
+        credentialConfigurations.addAll(credentialIssuerService.getCredentialConfigurations());
         return credentialConfigurations;
     }
 
-    public CredentialConfiguration getById(String id) throws JsonProcessingException {
+    public CredentialConfiguration getById(String id) {
         CredentialConfiguration c = issuerServerProperties.findCredentialConfiguration(id);
 
         if (c != null) {
             return c;
         }
 
-        return credentialIsserService.getCredentialConfigurationById(id);
+        return credentialIssuerService.getCredentialConfigurationById(id);
     }
 
 
