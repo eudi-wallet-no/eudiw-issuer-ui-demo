@@ -1,13 +1,17 @@
 package no.idporten.eudiw.issuer.ui.demo.byob.model;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
 public class CredentialDefinition {
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("credential_configuration_id")
     private String credentialConfigurationId;
+
     private String vct;
     private String format;
 
