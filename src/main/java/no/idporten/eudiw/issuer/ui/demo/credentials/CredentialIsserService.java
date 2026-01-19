@@ -57,9 +57,12 @@ public class CredentialIsserService {
 
         String description = getDescription(cd);
 
+        // TODO: Hent scope fra application.yaml
+        String scope = "eudiw:eidas2sandkasse:dynamicvc";
+
         return new CredentialConfiguration(
                 cd.getCredentialConfigurationId(),
-                cd.getVct(),
+                scope,
                 "50917500484",
                 description,
                 json
