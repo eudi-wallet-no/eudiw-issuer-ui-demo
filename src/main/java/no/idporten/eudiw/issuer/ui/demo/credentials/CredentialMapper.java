@@ -6,8 +6,6 @@ import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import no.idporten.eudiw.issuer.ui.demo.exception.IssuerUiException;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 @Component
 public class CredentialMapper {
 
@@ -20,18 +18,16 @@ public class CredentialMapper {
     public CredentialDto toDto(CredentialDefinition cd) {
         try {
             return new CredentialDto(cd.getVct(), objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cd));
-        }
-        catch (JsonProcessingException e) {
-            throw new IssuerUiException(e.getMessage());
+        } catch (JsonProcessingException e) {
+            throw new IssuerUiException("Failed converting to CredentialDto from CredentialDefinition from %s".formatted(cd), e);
         }
     }
 
     public CredentialDefinition fromDto(CredentialDto dto) {
         try {
             return objectMapper.readValue(dto.json(), CredentialDefinition.class);
-        }
-        catch (JsonProcessingException e) {
-            throw new IssuerUiException(e.getMessage());
+        } catch (JsonProcessingException e) {
+            throw new IssuerUiException("Failed converting to CredentialDefinition from CredentialDto.json=%s".formatted(dto.json()), e);
         }
     }
 }

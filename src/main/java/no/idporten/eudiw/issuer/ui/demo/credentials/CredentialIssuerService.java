@@ -22,7 +22,7 @@ import java.util.List;
 public class CredentialIssuerService {
     private final ByobService byobService;
     private final ObjectMapper objectMapper;
-    private final Logger log  = LoggerFactory.getLogger(CredentialIssuerService.class);
+    private final Logger log = LoggerFactory.getLogger(CredentialIssuerService.class);
 
     @Autowired
     public CredentialIssuerService(ByobService byobService, ObjectMapper objectMapper) {
@@ -31,7 +31,7 @@ public class CredentialIssuerService {
     }
 
     public List<CredentialConfiguration> getCredentialConfigurations() {
-       return getCustomCredentials();
+        return getCustomCredentials();
     }
 
     public CredentialConfiguration getCredentialConfigurationById(String id) {
@@ -70,12 +70,12 @@ public class CredentialIssuerService {
 
     private static String getDescription(CredentialDefinition cd) {
         return cd
-            .getCredentialMetadata()
-            .display()
-            .stream()
-            .findFirst()
-            .map(Display::name)
-            .orElse("Navn ikke funnet");
+                .getCredentialMetadata()
+                .display()
+                .stream()
+                .findFirst()
+                .map(Display::name)
+                .orElse("Navn ikke funnet");
     }
 
     private IssuanceDefinition convertFromCredentialDefinitionToIssuanceDefinition(CredentialDefinition cd, String personId) {
@@ -96,8 +96,7 @@ public class CredentialIssuerService {
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(issuanceDefinition);
         } catch (JsonProcessingException e) {
-            log.error("Failed to parse issuanceDefinition: {}",issuanceDefinition,e);
-            throw new IssuerUiException("Failed to parse issuanceDefinition",e);
+            throw new IssuerUiException("Failed to parse issuanceDefinition: %s".formatted(issuanceDefinition.credentialConfigurationId()), e);
         }
     }
 }
