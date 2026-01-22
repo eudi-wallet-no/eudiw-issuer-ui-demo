@@ -3,6 +3,7 @@ package no.idporten.eudiw.issuer.ui.demo.credentials;
 import no.idporten.eudiw.issuer.ui.demo.byob.ByobService;
 import no.idporten.eudiw.issuer.ui.demo.byob.CredentialDefinitionFactory;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
+import no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm.AdvAddCredentialForm;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,6 +41,10 @@ public class CredentialService {
 
         cd.setVct(dto.vct());
         byobService.addCredentialDefinition(cd);
+    }
+
+    public void storeCredential(AdvAddCredentialForm formData) {
+
     }
 
     public void deleteCredential(String cvt) {

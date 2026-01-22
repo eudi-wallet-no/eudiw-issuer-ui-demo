@@ -7,6 +7,7 @@ import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialService;
 import no.idporten.eudiw.issuer.ui.demo.issuer.config.IssuerServerProperties;
 import no.idporten.eudiw.issuer.ui.demo.web.models.AddCredentialForm;
 import no.idporten.eudiw.issuer.ui.demo.web.models.EditCredentialForm;
+import no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm.AdvAddCredentialForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -90,4 +91,17 @@ public class AdminController {
         credentialService.deleteCredential(credentialConfigurationId);
         return new ModelAndView("redirect:/admin", "credentials", credentialService.getCredentials());
     }*/
+
+
+    @GetMapping("/add-credential-new")
+    public ModelAndView showForm() {
+        return new ModelAndView("add-new", "form", new AdvAddCredentialForm());
+    }
+
+    @PostMapping("/add-credential-new")
+    public String submitForm(@ModelAttribute("form") AdvAddCredentialForm form) {
+        // form.id(), form.name(), form.claims()
+        return "redirect:/admin";
+    }
+
 }
