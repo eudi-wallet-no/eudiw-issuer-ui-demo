@@ -8,6 +8,18 @@
             display: flex;
             flex-direction: row;
             gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .claim_field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+            justify-content: flex-start;
+            align-items: center;
         }
     </style>
     <script>
@@ -15,15 +27,9 @@
             const container = document.getElementById("claims");
             const index = container.children.length;
 
-            const template = `
-                <div class="claim">
-                    <input class="ds-input" style="width: 20%;" type="text" name="claims[${index}].path" placeholder="Path" />
-                    <input class="ds-input" style="width: 20%;" type="text" name="claims[${index}].name" placeholder="Name" />
-                    <input class="ds-input" style="width: 20%;" type="text" name="claims[${index}].exampleValue" placeholder="Example Value" />
-                    <button class="ds-button" data-color="danger" data-variant="tertiary" type="button" onclick="removeClaim(this)">Slett</button>
-                </div>
-            `;
-            container.insertAdjacentHTML("beforeend", template);
+            const template = document.getElementById("claim-template").innerHTML;
+            const html = template.replaceAll("INDEX", `${index}`);
+            container.insertAdjacentHTML("beforeend", html);
         }
 
         function removeClaim(button) {
@@ -40,10 +46,16 @@
             });
         }
     </script>
+
 </head>
 
 <body>
 <header th:replace="~{fragments/general :: page_header_fragment}"></header>
+
+
+<template id="claim-template">
+    <th:block th:replace="~{fragments/claim :: claim('INDEX')}"/>
+</template>
 
 <main>
     <div>
@@ -55,14 +67,37 @@
         <p class="ds-paragraph ds-alert">Det kan ta inntil ett minutt før bevistypen er tilgjengelig i utstederen.</p>
     </div>
 
-    <form th:action="@{/add-credential-new}" th:object="${form}" method="post">
+    <form   th:fragment="add_attributes_form_fragment"
+            id="add_attributes_form"
+            th:action="@{/add-credential-new}"
+            th:object="${form}" method="post">
 
-        <div style="display: grid; grid-template-columns: 60px 1fr; grid-gap: 10px; align-items: center; justify-content: center;">
-            <label for="id-field" class="ds-label">VCT</label>
-             <input id="id-field" style="width:50%;" class="ds-input" type="text" th:field="*{id}" />
+        <div>
+            <div class="ds-field"
+                 style="display: grid; grid-template-columns: 60px 1fr; grid-gap: 10px; align-items: center; justify-content: center;"
+                 th:classappend="${#fields.hasErrors('vct')} ? 'ds-field--error'">
 
-            <label for="name-field" class="ds-label">Name</label>
-            <input id="name-field" style="width:50%;" class="ds-input" type="text" th:field="*{name}" />
+                <label class="ds-label" for="vct">VCT</label>
+
+                <input class="ds-input"
+                       type="text"
+                       id="vct"
+                       th:field="*{vct}"
+                       style="width: 50%" >
+
+                <div th:if="${#fields.hasErrors('vct')}" style="grid-column-start: 1; grid-column-end: 3;">
+                    <div class="ds-validation-message"
+                         data-field="validation"
+                         th:each="error : ${#fields.errors('vct')}" th:text="${error}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="ds-field"
+                 style="display: grid; grid-template-columns: 60px 1fr; grid-gap: 10px; align-items: center; justify-content: center;">
+                <label for="name-field" class="ds-label">Name</label>
+                <input id="name-field" style="width:50%;" class="ds-input" type="text" th:field="*{name}" />
+            </div>
         </div>
 
         <hr/>
@@ -70,23 +105,8 @@
         <h3>Claims</h3>
 
         <div id="claims">
-            <div class="claim" th:each="claim, stat : *{claims}">
-                <input class="ds-input"
-                       type="text"
-                       th:field="*{claims[__${stat.index}__].path}"
-                       placeholder="Path"/>
-
-                <input class="ds-input"
-                       type="text"
-                       th:field="*{claims[__${stat.index}__].name}"
-                       placeholder="Name"/>
-
-                <input class="ds-input"
-                       type="text"
-                       th:field="*{claims[__${stat.index}__].exampleValue}"
-                       placeholder="Example Value"/>
-
-                <button class="ds-button" data-color="danger" data-variant="tertiary" type="button" onclick="removeClaim(this)">Slett</button>
+            <div th:each="claim, stat : *{claims}">
+                <th:block th:replace="~{fragments/claim :: claim(${stat.index})}"/>
             </div>
         </div>
 
@@ -94,7 +114,7 @@
 
         <hr/>
 
-        <button class="ds-button" type="submit">Legg til bevistype</button>
+        <button class="ds-button" type="submit" form="add_attributes_form">Legg til bevistype</button>
     </form>
 
 </main>

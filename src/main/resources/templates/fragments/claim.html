@@ -1,0 +1,40 @@
+<div class="claim" th:fragment="claim(index)">
+
+    <div class="claim_field">
+        <input class="ds-input"
+               type="text"
+               th:name="|claims[${index}].path|"
+               placeholder="Path"
+                id="claim_path"/>
+
+        <input class="ds-input"
+               type="text"
+               th:name="|claims[${index}].name|"
+               placeholder="Name"
+               id="claim_name"/>
+    </div>
+
+    <div class="claim_field">
+        <input class="ds-input"
+               type="text"
+               disabled
+               placeholder="Type: String"
+               value="String"
+                id="claim_type"/>
+
+
+        <input class="ds-input"
+               type="text"
+               th:name="|claims[${index}].exampleValue|"
+               placeholder="Example Value"
+                id="claim_exampleValue"/>
+    </div>
+
+    <button class="ds-button"
+            data-color="danger"
+            data-variant="tertiary"
+            type="button"
+            onclick="removeClaim(this)">
+        Slett
+    </button>
+</div>

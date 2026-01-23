@@ -7,7 +7,7 @@ import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialService;
 import no.idporten.eudiw.issuer.ui.demo.issuer.config.IssuerServerProperties;
 import no.idporten.eudiw.issuer.ui.demo.web.models.AddCredentialForm;
 import no.idporten.eudiw.issuer.ui.demo.web.models.EditCredentialForm;
-import no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm.AdvAddCredentialForm;
+import no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm.SimpleCredentialForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -47,7 +47,7 @@ public class AdminController {
     }
 
     @PostMapping("/add-credential")
-    public ModelAndView addNewCredential(@Valid AddCredentialForm addCredentialForm, BindingResult bindingResult) throws JsonProcessingException {
+    public ModelAndView addNewCredential(@Valid AddCredentialForm addCredentialForm, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // TODO: Add json validation
             logger.error("BindingResult errors: {}", bindingResult.getAllErrors());
@@ -77,7 +77,7 @@ public class AdminController {
             return new ModelAndView("add", "editCredentialForm", editCredentialForm);
         }
 
-        logger.info("Editing credential with id {}", credentialConfigurationId);
+        logger.info("Editing credential with vct {}", credentialConfigurationId);
 
         credentialService.editCredential(new CredentialDto(credentialConfigurationId, editCredentialForm.json()));
         return new ModelAndView("redirect:/admin", "credentials", credentialService.getCredentials());
@@ -86,7 +86,7 @@ public class AdminController {
     /*
     @GetMapping("/delete-credential/{credential_configuration_id}")
     public ModelAndView deleteCredential(@PathVariable("credential_configuration_id") String credentialConfigurationId) {
-        logger.info("Deleting credential with id {}", credentialConfigurationId);
+        logger.info("Deleting credential with vct {}", credentialConfigurationId);
 
         credentialService.deleteCredential(credentialConfigurationId);
         return new ModelAndView("redirect:/admin", "credentials", credentialService.getCredentials());
@@ -95,13 +95,20 @@ public class AdminController {
 
     @GetMapping("/add-credential-new")
     public ModelAndView showForm() {
-        return new ModelAndView("add-new", "form", new AdvAddCredentialForm());
+        return new ModelAndView("add-new", "form", new SimpleCredentialForm());
     }
 
     @PostMapping("/add-credential-new")
-    public String submitForm(@ModelAttribute("form") AdvAddCredentialForm form) {
-        // form.id(), form.name(), form.claims()
-        return "redirect:/admin";
+    public ModelAndView submitForm(@Valid @ModelAttribute("form") SimpleCredentialForm form,
+                                   BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // TODO: Add json validation
+            logger.error("BindingResult errors: {}", bindingResult.getAllErrors());
+            return new ModelAndView("add-new", "form", form);
+        }
+
+        credentialService.storeCredential(form);
+        return new ModelAndView("redirect:/admin");
     }
 
 }
