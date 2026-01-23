@@ -15,12 +15,21 @@
     </div>
 
     <div class="claim_field">
-        <input class="ds-input"
+        <!--<input class="ds-input"
                type="text"
                disabled
-               placeholder="Type: String"
+               placeholder="Type"
                value="String"
-                id="claim_type"/>
+                id="claim_type"/> -->
+        <select class="ds-input" selected="String">
+            <option disabled value="">Velg en type</option>
+            <option value="String">String</option>
+            <option disabled value="Integer">Integer</option>
+            <option disabled value="Boolean">Boolean</option>
+            <option disabled value="Date">Date</option>
+            <option disabled value="Map">Map</option>
+            <option disabled value="List">List</option>
+        </select>
 
 
         <input class="ds-input"

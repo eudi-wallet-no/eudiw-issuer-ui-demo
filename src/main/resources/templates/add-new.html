@@ -72,6 +72,20 @@
             th:action="@{/add-credential-new}"
             th:object="${form}" method="post">
 
+        <div class="ds-alert"
+             data-color="danger"
+             th:if="${#fields.hasAnyErrors()}">
+            <p class="ds-paragraph" data-size="lg">
+                Skjemaet inneholder feil:
+            </p>
+
+            <ul style="margin-block-start: 0.2em; margin-inline-start: 0.8em;">
+                <li th:each="error : ${#fields.allErrors()}"
+                    th:text="${error}">
+                </li>
+            </ul>
+        </div>
+
         <div>
             <div class="ds-field"
                  style="display: grid; grid-template-columns: 60px 1fr; grid-gap: 10px; align-items: center; justify-content: center;"
@@ -85,12 +99,6 @@
                        th:field="*{vct}"
                        style="width: 50%" >
 
-                <div th:if="${#fields.hasErrors('vct')}" style="grid-column-start: 1; grid-column-end: 3;">
-                    <div class="ds-validation-message"
-                         data-field="validation"
-                         th:each="error : ${#fields.errors('vct')}" th:text="${error}">
-                    </div>
-                </div>
             </div>
 
             <div class="ds-field"

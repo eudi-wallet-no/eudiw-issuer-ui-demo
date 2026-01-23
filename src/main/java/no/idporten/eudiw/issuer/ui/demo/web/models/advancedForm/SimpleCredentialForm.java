@@ -1,5 +1,6 @@
 package no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import no.idporten.eudiw.issuer.ui.demo.credentials.unique.UniqueVct;
@@ -17,6 +18,8 @@ public record SimpleCredentialForm(
         String vct,
 
         String name,
+
+        @Valid
         List<ClaimForm> claims
 ) {
     public SimpleCredentialForm() {

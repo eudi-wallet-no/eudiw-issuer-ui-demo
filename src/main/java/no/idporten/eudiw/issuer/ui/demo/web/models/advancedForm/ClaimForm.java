@@ -3,13 +3,13 @@ package no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm;
 import jakarta.validation.constraints.NotBlank;
 
 public record ClaimForm(
-        @NotBlank(message = "path kan ikke være tom")
+        @NotBlank(message = "Path kan ikke være tom")
         String path,
-        @NotBlank(message = "name kan ikke vær tom")
+        @NotBlank(message = "Name kan ikke vær tom")
         String name,
-        @NotBlank(message = "type kan ikke være tom")
+
         String type,
-        @NotBlank(message = "Du må oppgi en eksempelverdi")
+        @NotBlank(message = "Eksempelverdi kan ikke være tom")
         String exampleValue) {
     public ClaimForm() {
         this("", "", "String", "");
