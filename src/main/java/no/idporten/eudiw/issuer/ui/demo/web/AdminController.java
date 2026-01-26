@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Objects;
-
 @Controller
 public class AdminController {
 
@@ -105,8 +103,7 @@ public class AdminController {
     @PostMapping("/add-credential-new")
     public ModelAndView submitForm(@Validated(CreateForm.class) @Valid @ModelAttribute("form") SimpleCredentialForm form,
                                    BindingResult bindingResult) {
-        if (bindingResult.hasErrors() || Objects.isNull(form.claims())) {
-            // TODO: Add json validation
+        if (bindingResult.hasErrors()) {
             logger.error("BindingResult errors: {}", bindingResult.getAllErrors());
             return new ModelAndView("add-new", "form", form);
         }
@@ -125,7 +122,7 @@ public class AdminController {
     public ModelAndView edit(@PathVariable String vct,
                              @Validated(EditForm.class) @Valid SimpleCredentialForm form,
                              BindingResult bindingResult) {
-        if (bindingResult.hasErrors() || Objects.isNull(form.claims())) {
+        if (bindingResult.hasErrors()) {
             logger.error("BindingResult errors: {}", bindingResult.getAllErrors());
             return new ModelAndView("edit-new", "form", form);
         }
