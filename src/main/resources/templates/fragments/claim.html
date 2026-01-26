@@ -19,12 +19,12 @@
     <div class="claim_field">
         <select class="ds-input" th:name="|claims[${index}].type|">
             <option disabled th:selected="${claimData == null or claimData.type == null}" value="">Velg en type</option>
-            <option value="String" th:selected="${claimData != null and claimData.type == 'String'}">String</option>
-            <option disabled value="Integer">Integer</option>
-            <option disabled value="Boolean">Boolean</option>
-            <option disabled value="Date">Date</option>
-            <option disabled value="Map">Map</option>
-            <option disabled value="List">List</option>
+            <option value="string" th:selected="${claimData != null and claimData.type == 'string'}">String</option>
+            <option disabled value="integer">Integer</option>
+            <option disabled value="boolean">Boolean</option>
+            <option disabled value="date">Date</option>
+            <option disabled value="map">Map</option>
+            <option disabled value="list">List</option>
         </select>
 
         <input class="ds-input"

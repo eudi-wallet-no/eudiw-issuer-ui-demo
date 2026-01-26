@@ -1,10 +1,10 @@
 package no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm;
 
 public class ClaimType {
-    public static String STRING = "String";
-    public static String INTEGER = "Integer";
-    public static String BOOLEAN = "Boolean";
-    public static String DATE = "Date";
-    public static String MAP = "Map";
-    public static String LIST = "List";
+    public static String STRING = "string";
+    public static String INTEGER = "integer";
+    public static String BOOLEAN = "boolean";
+    public static String DATE = "date";
+    public static String MAP = "map";
+    public static String LIST = "list";
 }

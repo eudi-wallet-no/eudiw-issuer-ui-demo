@@ -12,10 +12,10 @@ public record ClaimForm(
         @NotBlank(message = "Eksempelverdi kan ikke være tom")
         String exampleValue) {
     public ClaimForm() {
-        this("", "", "String", "");
+        this("", "", ClaimType.STRING, "");
     }
 
     public ClaimForm(String path, String name, String exampleValue) {
-        this(path, name, "String", exampleValue);
+        this(path, name, ClaimType.STRING, exampleValue);
     }
 }
