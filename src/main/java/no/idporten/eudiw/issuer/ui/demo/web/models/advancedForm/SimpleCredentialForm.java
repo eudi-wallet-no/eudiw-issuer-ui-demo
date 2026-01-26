@@ -2,6 +2,7 @@ package no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
 import no.idporten.eudiw.issuer.ui.demo.byob.model.ExampleCredentialData;
@@ -13,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public record SimpleCredentialForm(
-        @NotBlank(message = "VCT er påkrevd")
+        @NotBlank(message = "VCT er påkrevd", groups = CreateForm.class)
         @Pattern(
                 regexp = "^[a-z0-9_:]{3,155}",
                 message = "VCT kan kun bestå av små bokstaver, tall, kolon og understrek.\n Lengde: 3-155 tegn",
@@ -25,7 +26,11 @@ public record SimpleCredentialForm(
 
         String name,
 
-        @Valid
+        @Valid()
+        @NotNull(
+                message = "Beviset må ha minimum 1 claim",
+                groups = { CreateForm.class, EditForm.class }
+        )
         List<ClaimForm> claims
 ) {
     public SimpleCredentialForm() {
