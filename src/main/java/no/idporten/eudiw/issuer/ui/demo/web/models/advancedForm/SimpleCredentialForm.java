@@ -19,7 +19,7 @@ public record SimpleCredentialForm(
                 message = "VCT kan kun bestå av små bokstaver, tall, kolon og understrek.\n Lengde: 3-155 tegn",
                 groups = CreateForm.class
         )
-        @UniqueVct()
+        @UniqueVct(groups = CreateForm.class)
         String vct,
 
 

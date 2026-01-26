@@ -1,6 +1,5 @@
 package no.idporten.eudiw.issuer.ui.demo.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialDto;
 import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialService;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -120,7 +118,7 @@ public class AdminController {
     }
 
     @GetMapping("/edit-credential-new/{vct}")
-    public ModelAndView edit(@PathVariable("vct") String vct) {
+    public ModelAndView edit(@PathVariable String vct) {
         SimpleCredentialForm form = credentialService.findSimpleCredential(vct);
         return new ModelAndView("edit-new", "form", form);
     }
@@ -130,12 +128,8 @@ public class AdminController {
                              @Validated(EditForm.class) @Valid SimpleCredentialForm form,
                              BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            List<String> codes = Arrays.asList(Objects.requireNonNull(bindingResult.getAllErrors().getFirst().getCodes()));
-
-            if (codes.size() != 1 && !codes.contains("UniqueVct")) {
-                logger.error("BindingResult errors: {}", bindingResult.getAllErrors());
-                return new ModelAndView("edit-new", "form", form);
-            }
+            logger.error("BindingResult errors: {}", bindingResult.getAllErrors());
+            return new ModelAndView("edit-new", "form", form);
         }
 
         credentialService.editCredential(new SimpleCredentialForm(vct, form.name(), form.claims()));
