@@ -28,7 +28,7 @@ public record SimpleCredentialForm(
 
         @Valid()
         @NotNull(
-                message = "Beviset må ha minimum 1 claim",
+                message = "Beviset må ha minimum 1. claim",
                 groups = { CreateForm.class, EditForm.class }
         )
         List<ClaimForm> claims

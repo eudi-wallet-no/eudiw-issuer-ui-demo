@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm.SimpleCredentialForm;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CredentialDefinition {
@@ -72,16 +73,26 @@ public class CredentialDefinition {
 
 
     private CredentialMetadata extractMetadata(SimpleCredentialForm form) {
+        List<Display> display = List.of(new Display(form.name()));
+
+        if (form.claims() == null) {
+            return new CredentialMetadata(display, Collections.emptyList());
+        }
+
         List<Claim> claims = form
                 .claims()
                 .stream()
                 .map(claim -> new Claim(claim.path(), claim.type(), true, List.of(new Display(claim.name()))))
                 .toList();
-        List<Display> display = List.of(new Display(form.name()));
+
         return new CredentialMetadata(display, claims);
     }
 
     private List<ExampleCredentialData> extractExampleData(SimpleCredentialForm form) {
+        if (form.claims() == null) {
+            return Collections.emptyList();
+        }
+
         return form
                 .claims()
                 .stream()

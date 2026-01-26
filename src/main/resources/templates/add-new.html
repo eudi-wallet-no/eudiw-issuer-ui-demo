@@ -68,7 +68,11 @@
 
         <h3>Claims</h3>
 
-        <div id="claims"> </div>
+        <div id="claims">
+            <div th:each="claim, stat : *{claims}">
+                <th:block th:insert="~{fragments/claim :: claim(${stat.index}, ${claim})}"/>
+            </div>
+        </div>
 
         <button type="button" class="ds-button" data-variant="secondary" onclick="addClaim()">Legg til Claim</button>
 
