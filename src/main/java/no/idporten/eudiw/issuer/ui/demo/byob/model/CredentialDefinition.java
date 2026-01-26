@@ -75,7 +75,7 @@ public class CredentialDefinition {
         List<Claim> claims = form
                 .claims()
                 .stream()
-                .map(claim -> new Claim(claim.path(), claim.type(), true, List.of(new Display(claim.exampleValue()))))
+                .map(claim -> new Claim(claim.path(), claim.type(), true, List.of(new Display(claim.name()))))
                 .toList();
         List<Display> display = List.of(new Display(form.name()));
         return new CredentialMetadata(display, claims);
