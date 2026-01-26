@@ -3,49 +3,6 @@
 <head>
     <th:block th:replace="~{fragments/general :: base_head_fragment}"></th:block>
     <title>Bevisgenerator</title>
-    <style>
-        .claim {
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .claim_field {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            width: 100%;
-            justify-content: flex-start;
-            align-items: center;
-        }
-    </style>
-    <script>
-        function addClaim() {
-            const container = document.getElementById("claims");
-            const index = container.children.length;
-
-            const template = document.getElementById("claim-template").innerHTML;
-            const html = template.replaceAll("INDEX", `${index}`);
-            container.insertAdjacentHTML("beforeend", html);
-        }
-
-        function removeClaim(button) {
-            button.parentElement.remove();
-            reindexClaims();
-        }
-
-        function reindexClaims() {
-            const claims = document.querySelectorAll("#claims .claim");
-            claims.forEach((claim, i) => {
-                claim.querySelectorAll("input").forEach(input => {
-                    input.name = input.name.replace(/\[\d+]/, `[${i}]`);
-                });
-            });
-        }
-    </script>
-
 </head>
 
 <body>
@@ -113,5 +70,6 @@
 </main>
 
 <footer th:replace="~{fragments/general :: page_footer_fragment(issuer=${issuerUrl})}"></footer>
+<script th:src="@{/js/credential-form.js}"></script>
 </body>
 </html>
