@@ -59,16 +59,16 @@
 <main>
     <div>
         <h1 class="ds-heading" data-size="lg">
-            Legg til bevistype
+            Rediger bevistype
         </h1>
     </div>
     <div>
         <p class="ds-paragraph ds-alert">Det kan ta inntil ett minutt før bevistypen er tilgjengelig i utstederen.</p>
     </div>
 
-    <form   th:fragment="add_attributes_form_fragment"
-            id="add_attributes_form"
-            th:action="@{/add-credential-new}"
+    <form   th:fragment="edit_attributes_form_fragment"
+            id="edit_attributes_form"
+            th:action="@{/edit-credential-new/{id}(id=*{vct()})}"
             th:object="${form}" method="post">
 
         <div class="ds-alert"
@@ -87,20 +87,6 @@
 
         <div>
             <div class="ds-field"
-                 style="display: grid; grid-template-columns: 60px 1fr; grid-gap: 10px; align-items: center; justify-content: center;"
-                 th:classappend="${#fields.hasErrors('vct')} ? 'ds-field--error'">
-
-                <label class="ds-label" for="vct">VCT</label>
-
-                <input class="ds-input"
-                       type="text"
-                       id="vct"
-                       th:field="*{vct}"
-                       style="width: 50%" >
-
-            </div>
-
-            <div class="ds-field"
                  style="display: grid; grid-template-columns: 60px 1fr; grid-gap: 10px; align-items: center; justify-content: center;">
                 <label for="name-field" class="ds-label">Name</label>
                 <input id="name-field" style="width:50%;" class="ds-input" type="text" th:field="*{name}" />
@@ -111,13 +97,17 @@
 
         <h3>Claims</h3>
 
-        <div id="claims"> </div>
+        <div id="claims">
+            <div th:each="claim, stat : *{claims}">
+                <th:block th:insert="~{fragments/claim :: claim(${stat.index}, ${claim})}"/>
+            </div>
+        </div>
 
         <button type="button" class="ds-button" data-variant="secondary" onclick="addClaim()">Legg til Claim</button>
 
         <hr/>
 
-        <button class="ds-button" type="submit" form="add_attributes_form">Legg til bevistype</button>
+        <button class="ds-button" type="submit" form="edit_attributes_form">Rediger bevistype</button>
     </form>
 
 </main>

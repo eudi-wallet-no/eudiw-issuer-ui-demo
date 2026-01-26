@@ -35,4 +35,8 @@ public class CredentialMapper {
     public CredentialDefinition fromDto(SimpleCredentialForm dto) {
        return new CredentialDefinition(dto);
     }
+
+    public SimpleCredentialForm toSimpleCredentialForm(CredentialDefinition cd) {
+       return new SimpleCredentialForm(cd);
+    }
 }

@@ -36,6 +36,11 @@ public class CredentialService {
         return mapper.toDto(cd);
     }
 
+    public SimpleCredentialForm findSimpleCredential(String cvt) {
+        CredentialDefinition cd = byobService.getByVct(cvt);
+        return mapper.toSimpleCredentialForm(cd);
+    }
+
     public void storeCredential(CredentialDto dto) {
         CredentialDefinition cd =  mapper.fromDto(dto);
 
@@ -58,4 +63,10 @@ public class CredentialService {
         cd.setVct(dto.vct());
         byobService.editCredentialDefinition(cd);
     }
+
+    public void editCredential(SimpleCredentialForm formData) {
+        CredentialDefinition cd = mapper.fromDto(formData);
+        byobService.editCredentialDefinition(cd);
+    }
+
 }

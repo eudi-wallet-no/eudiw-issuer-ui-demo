@@ -14,4 +14,8 @@ public record ClaimForm(
     public ClaimForm() {
         this("", "", "String", "");
     }
+
+    public ClaimForm(String path, String name, String exampleValue) {
+        this(path, name, "String", exampleValue);
+    }
 }
