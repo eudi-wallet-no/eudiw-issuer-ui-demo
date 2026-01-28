@@ -1,9 +1,9 @@
 package no.idporten.eudiw.issuer.ui.demo.web;
 
 import jakarta.validation.Valid;
-import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialDto;
-import no.idporten.eudiw.issuer.ui.demo.credentials.CredentialService;
-import no.idporten.eudiw.issuer.ui.demo.issuer.config.IssuerServerProperties;
+import no.idporten.eudiw.issuer.ui.demo.byob.CredentialDto;
+import no.idporten.eudiw.issuer.ui.demo.byob.CredentialService;
+import no.idporten.eudiw.issuer.ui.demo.integration.issuerserver.config.IssuerServerProperties;
 import no.idporten.eudiw.issuer.ui.demo.web.models.AddCredentialForm;
 import no.idporten.eudiw.issuer.ui.demo.web.models.EditCredentialForm;
 import no.idporten.eudiw.issuer.ui.demo.web.models.advancedForm.CreateForm;

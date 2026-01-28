@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import no.idporten.eudiw.issuer.ui.demo.byob.model.CredentialDefinition;
-import no.idporten.eudiw.issuer.ui.demo.byob.model.ExampleCredentialData;
-import no.idporten.eudiw.issuer.ui.demo.credentials.unique.UniqueVct;
+import no.idporten.eudiw.issuer.ui.demo.integration.byobservice.model.CredentialDefinition;
+import no.idporten.eudiw.issuer.ui.demo.integration.byobservice.model.ExampleCredentialData;
+import no.idporten.eudiw.issuer.ui.demo.web.models.unique.UniqueVct;
 
 import java.util.ArrayList;
 import java.util.List;

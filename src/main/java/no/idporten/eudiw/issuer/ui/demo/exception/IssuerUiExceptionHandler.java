@@ -1,6 +1,6 @@
 package no.idporten.eudiw.issuer.ui.demo.exception;
 
-import no.idporten.eudiw.issuer.ui.demo.issuer.config.IssuerServerProperties;
+import no.idporten.eudiw.issuer.ui.demo.integration.issuerserver.config.IssuerServerProperties;
 import no.idporten.lib.maskinporten.exception.MaskinportenClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
