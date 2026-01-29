@@ -8,7 +8,7 @@ public record IssuanceDefinition(
         @JsonProperty("subject")
         IssuanceSubject subject,
         @JsonProperty("credential_data")
-        IssuanceCredentialData claims
+        IssuanceCredentialData credentialData
 ) {
     public IssuanceDefinition(String credentialConfigurationId, String id, IssuanceCredentialData credentialData) {
         this(credentialConfigurationId, new IssuanceSubject(id),  credentialData);
