@@ -10,6 +10,8 @@ public class CredentialDefinitionFactory {
     public static CredentialDefinition empty() {
         return new CredentialDefinition(
                 "your-credential-configuration-name (automatically generated)",
+                "dc+sd-jwt", // default format for credential type
+                "eudiw:eidas2sandkasse:dynamicvc", // default scope for credential type
                 new ExampleCredentialData(Map.of(
                         "family_name", "Normann",
                         "given_name", "Kari"
