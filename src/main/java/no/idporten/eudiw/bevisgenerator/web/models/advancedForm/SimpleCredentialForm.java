@@ -21,9 +21,9 @@ public record SimpleCredentialForm(
         )
         @UniqueCredentialType(groups = CreateForm.class)
         String credentialType,
-        @NotBlank(message = "Format er påkrevd", groups = CreateForm.class)
+        @NotBlank(message = "Format er påkrevd", groups = { CreateForm.class, EditForm.class })
         String format,
-        @NotBlank(message = "Scope er påkrevd", groups = CreateForm.class)
+        @NotBlank(message = "Scope er påkrevd", groups = { CreateForm.class, EditForm.class })
         String scope,
 
         String name,
