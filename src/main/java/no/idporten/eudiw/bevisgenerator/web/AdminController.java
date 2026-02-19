@@ -69,15 +69,15 @@ public class AdminController {
         return new ModelAndView("redirect:/admin", "credentials", credentialService.getCredentials());
     }
 
-    @GetMapping("/edit-credential/{credential-type}")
-    public ModelAndView editCredential(@PathVariable("credential-type") String credentialType) {
+    @GetMapping("/edit-credential/{credential_type}")
+    public ModelAndView editCredential(@PathVariable("credential_type") String credentialType) {
         CredentialDto cd = credentialService.findCredential(credentialType);
         return new ModelAndView("edit", "editCredentialForm", new EditCredentialForm(credentialType, cd.json()));
     }
 
-    @PostMapping("/edit-credential/{credential-type}")
+    @PostMapping("/edit-credential/{credential_type}")
     public ModelAndView editCredentialPost(
-            @PathVariable("credential-type") String credentialType,
+            @PathVariable("credential_type") String credentialType,
             @Valid EditCredentialForm editCredentialForm,
             BindingResult bindingResult
     ) {
@@ -120,14 +120,14 @@ public class AdminController {
         return new ModelAndView("redirect:/admin");
     }
 
-    @GetMapping("/edit-credential-new/{credential-type}")
-    public ModelAndView edit(@PathVariable("credential-type") String credentialType) {
+    @GetMapping("/edit-credential-new/{credential_type}")
+    public ModelAndView edit(@PathVariable("credential_type") String credentialType) {
         SimpleCredentialForm form = credentialService.findSimpleCredential(credentialType);
         return new ModelAndView("edit-new", "form", form);
     }
 
-    @PostMapping("/edit-credential-new/{credential-type}")
-    public ModelAndView edit(@PathVariable("credential-type") String credentialType,
+    @PostMapping("/edit-credential-new/{credential_type}")
+    public ModelAndView edit(@PathVariable("credential_type") String credentialType,
                              @Validated(EditForm.class) @Valid SimpleCredentialForm form,
                              BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
