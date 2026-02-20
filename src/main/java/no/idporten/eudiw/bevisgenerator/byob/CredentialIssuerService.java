@@ -28,8 +28,8 @@ public class CredentialIssuerService {
         this.objectMapper = objectMapper;
     }
 
-    public List<CredentialConfiguration> getCredentialConfigurations() {
-        return getCustomCredentials();
+    public List<CredentialConfiguration> getCredentialConfigurationsForIssuance() {
+        return getCustomCredentialsForIssuance();
     }
 
     public CredentialConfiguration getCredentialConfigurationById(String id) {
@@ -37,8 +37,15 @@ public class CredentialIssuerService {
         return convertCredentialDefinitionCredentials(cd);
     }
 
-    private List<CredentialConfiguration> getCustomCredentials() {
-        return byobService.getCredentialDefinitions()
+    private List<CredentialConfiguration> getCustomCredentialsForEdit() {
+        return byobService.getCredentialDefinitionsForEdit()
+                .stream()
+                .map(this::convertCredentialDefinitionCredentials)
+                .toList();
+    }
+
+    private List<CredentialConfiguration> getCustomCredentialsForIssuance() {
+        return byobService.getCredentialDefinitionsForIssuance()
                 .stream()
                 .map(this::convertCredentialDefinitionCredentials)
                 .toList();
