@@ -37,13 +37,6 @@ public class CredentialIssuerService {
         return convertCredentialDefinitionCredentials(cd);
     }
 
-    private List<CredentialConfiguration> getCustomCredentialsForEdit() {
-        return byobService.getCredentialDefinitionsForEdit()
-                .stream()
-                .map(this::convertCredentialDefinitionCredentials)
-                .toList();
-    }
-
     private List<CredentialConfiguration> getCustomCredentialsForIssuance() {
         return byobService.getCredentialDefinitionsForIssuance()
                 .stream()
