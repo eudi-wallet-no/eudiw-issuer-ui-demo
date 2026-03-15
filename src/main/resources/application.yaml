@@ -73,7 +73,7 @@ bevisgenerator:
         person-identifier: 05821098825
         json-request: |
           {
-            "credential_issuer": "${bevisgenerator.issuer-server.demo-credential-issuer}",
+            "credential_issuer": "${bevisgenerator.issuer-server.demo-pid-credential-issuer}",
             "credential_configuration_id": "no.digdir.eudiw.pid_mso_mdoc",
             "subject": {
               "identifier": "05821098825"
