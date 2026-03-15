@@ -60,7 +60,7 @@ public class CredentialIssuerService {
         String scope = cd.getScope();
 
         return new CredentialConfiguration(
-                issuerServerProperties.credentialIssuer() + issuerServerProperties.issuanceEndpoint(),
+                issuerServerProperties.credentialIssuer(),
                 cd.getCredentialConfigurationId(),
                 scope,
                 personIdentifier,
