@@ -2,14 +2,12 @@
     const HISTORY_KEY = "bevisgenerator.revokeHistory.v1";
     const MAX_ITEMS = 100;
 
+    const $ = id => document.getElementById(id);
+
     function getHistory() {
         try {
-            const raw = localStorage.getItem(HISTORY_KEY);
-            if (!raw) {
-                return [];
-            }
-            const parsed = JSON.parse(raw);
-            return Array.isArray(parsed) ? parsed : [];
+            const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+            return Array.isArray(history) ? history : [];
         } catch (_err) {
             return [];
         }
@@ -19,23 +17,22 @@
         localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, MAX_ITEMS)));
     }
 
-    function deduplicate(items, issuanceTransactionId) {
-        return items.filter(item => item.issuanceTransactionId !== issuanceTransactionId);
-    }
-
     function addIssuedEntry(entry) {
         if (!entry.credentialConfigurationId || !entry.issuanceTransactionId) {
             return;
         }
-        const now = new Date().toISOString();
-        const history = deduplicate(getHistory(), entry.issuanceTransactionId);
+
+        const issuedAt = entry.issuedAt || new Date().toISOString();
+        const history = getHistory().filter(item => item.issuanceTransactionId !== entry.issuanceTransactionId);
+
         history.unshift({
-            issuedAt: entry.issuedAt || now,
+            issuedAt,
             credentialConfigurationId: entry.credentialConfigurationId,
             issuanceTransactionId: entry.issuanceTransactionId,
             status: entry.status || "issued",
             revokedAt: entry.revokedAt || null
         });
+
         saveHistory(history);
     }
 
@@ -43,92 +40,70 @@
         if (!issuanceTransactionId) {
             return;
         }
-        const now = new Date().toISOString();
-        const updated = getHistory().map(item => {
-            if (item.issuanceTransactionId !== issuanceTransactionId) {
-                return item;
-            }
-            return {
-                ...item,
-                status: "revoked",
-                revokedAt: now
-            };
-        });
-        saveHistory(updated);
+
+        const revokedAt = new Date().toISOString();
+        saveHistory(getHistory().map(item => item.issuanceTransactionId === issuanceTransactionId
+            ? {...item, status: "revoked", revokedAt}
+            : item));
     }
 
     function formatTime(value) {
         if (!value) {
             return "-";
         }
+
         const parsed = new Date(value);
-        if (Number.isNaN(parsed.getTime())) {
-            return value;
-        }
-        return parsed.toLocaleString("nb-NO");
+        return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString("nb-NO");
     }
 
-    function renderTable() {
-        const table = document.getElementById("recent-issued-table");
-        const tableBody = document.getElementById("recent-issued-body");
-        const emptyMessage = document.getElementById("recent-issued-empty-message");
-        const form = document.getElementById("revoke-form");
-        const credentialField = document.getElementById("credentialConfigurationId");
-        const issuanceField = document.getElementById("issuanceTransactionId");
+    function renderRow(item) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${formatTime(item.issuedAt)}</td>
+            <td>
+                <div style="display: grid; gap: 0.25rem;">
+                    <div>
+                        <strong>Credential configuration</strong><br>
+                        <code style="display: inline-block; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${item.credentialConfigurationId || "-"}</code>
+                    </div>
+                    <div>
+                        <strong>Issuance transaction</strong><br>
+                        <code style="display: inline-block; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${item.issuanceTransactionId || "-"}</code>
+                    </div>
+                </div>
+            </td>
+        `;
 
-        if (!table || !tableBody || !emptyMessage) {
+        return row;
+    }
+
+    function renderHistory() {
+        const table = $("recent-issued-table");
+        const body = $("recent-issued-body");
+        const emptyMessage = $("recent-issued-empty-message");
+
+        if (!table || !body || !emptyMessage) {
             return;
         }
 
         const history = getHistory();
-        tableBody.innerHTML = "";
+        body.innerHTML = "";
+        table.style.display = history.length ? "table" : "none";
+        emptyMessage.style.display = history.length ? "none" : "block";
 
-        if (history.length === 0) {
-            table.style.display = "none";
-            emptyMessage.style.display = "block";
+        if (!history.length) {
             return;
         }
 
-        table.style.display = "table";
-        emptyMessage.style.display = "none";
-
-        history.forEach(item => {
-            const row = document.createElement("tr");
-            const isRevoked = item.status === "revoked";
-            const statusText = isRevoked && item.revokedAt
-                ? `Revokert (${formatTime(item.revokedAt)})`
-                : "Utstedt";
-
-            row.innerHTML = `
-                <td>${formatTime(item.issuedAt)}</td>
-                <td>${item.credentialConfigurationId || "-"}</td>
-                <td><code style="display: inline-block; max-width: 14rem; overflow-wrap: anywhere; word-break: break-word;">${item.issuanceTransactionId || "-"}</code></td>
-                <td>${statusText}</td>
-                <td style="white-space: nowrap;">
-                    <button class="ds-button" data-size="sm" data-variant="secondary" type="button" ${isRevoked ? "disabled" : ""}>
-                        ${isRevoked ? "Allereie revokert" : "Revoker"}
-                    </button>
-                </td>
-            `;
-
-            const button = row.querySelector("button");
-            if (button && !isRevoked && form && credentialField && issuanceField) {
-                button.addEventListener("click", () => {
-                    credentialField.value = item.credentialConfigurationId || "";
-                    issuanceField.value = item.issuanceTransactionId || "";
-                    form.submit();
-                });
-            }
-
-            tableBody.appendChild(row);
-        });
+        history.forEach(item => body.appendChild(renderRow(item)));
     }
 
     function initIssuedMetadataCapture() {
-        const metadata = document.getElementById("issued-metadata");
+        const metadata = $("issued-metadata");
         if (!metadata) {
             return;
         }
+
         addIssuedEntry({
             credentialConfigurationId: metadata.dataset.credentialConfigurationId,
             issuanceTransactionId: metadata.dataset.issuanceTransactionId
@@ -136,20 +111,17 @@
     }
 
     function initRevokedSyncFromServer() {
-        const state = document.getElementById("revoke-page-state");
+        const state = $("revoke-page-state");
         if (!state) {
             return;
         }
+
         markRevoked(state.dataset.revokedIssuanceTransactionId);
     }
 
-    window.bevisgeneratorRevokeHistory = {
-        addIssuedEntry,
-        markRevoked,
-        getHistory
-    };
+    window.bevisgeneratorRevokeHistory = {addIssuedEntry, markRevoked, getHistory};
 
     initIssuedMetadataCapture();
     initRevokedSyncFromServer();
-    renderTable();
+    renderHistory();
 })();
