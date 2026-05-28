@@ -88,7 +88,7 @@ class RevokeControllerTest {
     }
 
     @Test
-    void postRevokeReturnsValidationErrorsForInvalidInput() throws Exception {
+    void postRevokeReturnsBadRequestForInvalidInput() throws Exception {
         mockMvc.perform(post("/revoke")
                         .param("credentialConfigurationId", "")
                         .param("issuanceTransactionId", ""))
@@ -98,7 +98,7 @@ class RevokeControllerTest {
     }
 
     @Test
-    void postRevokeReturnsErrorMessageWhenIssuerServerFails() throws Exception {
+    void postRevokeReturnsBadGatewayWhenIssuerServerFails() throws Exception {
         when(issuerServerService.getById(credentialConfiguration.credentialConfigurationId())).thenReturn(credentialConfiguration);
 
         HttpClientErrorException cause = HttpClientErrorException.create(
@@ -118,5 +118,15 @@ class RevokeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("revoke"))
                 .andExpect(model().attributeExists("errorMessage"));
+    }
+
+    @Test
+    void postQuickRevokeReturnsNoContentWhenRevoked() throws Exception {
+        when(issuerServerService.getById(credentialConfiguration.credentialConfigurationId())).thenReturn(credentialConfiguration);
+
+        mockMvc.perform(post("/revoke/quick")
+                        .param("credentialConfigurationId", credentialConfiguration.credentialConfigurationId())
+                        .param("issuanceTransactionId", "tx-123"))
+                .andExpect(status().isNoContent());
     }
 }

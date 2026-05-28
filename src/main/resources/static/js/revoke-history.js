@@ -1,6 +1,7 @@
 (function () {
     const HISTORY_KEY = "bevisgenerator.revokeHistory.v1";
     const MAX_ITEMS = 100;
+    const REVOKE_ENDPOINT = "/revoke/quick";
 
     const $ = id => document.getElementById(id);
 
@@ -28,23 +29,18 @@
         history.unshift({
             issuedAt,
             credentialConfigurationId: entry.credentialConfigurationId,
-            issuanceTransactionId: entry.issuanceTransactionId,
-            status: entry.status || "issued",
-            revokedAt: entry.revokedAt || null
+            issuanceTransactionId: entry.issuanceTransactionId
         });
 
         saveHistory(history);
     }
 
-    function markRevoked(issuanceTransactionId) {
+    function removeIssuedEntry(issuanceTransactionId) {
         if (!issuanceTransactionId) {
             return;
         }
 
-        const revokedAt = new Date().toISOString();
-        saveHistory(getHistory().map(item => item.issuanceTransactionId === issuanceTransactionId
-            ? {...item, status: "revoked", revokedAt}
-            : item));
+        saveHistory(getHistory().filter(item => item.issuanceTransactionId !== issuanceTransactionId));
     }
 
     function formatTime(value) {
@@ -61,7 +57,7 @@
         row.innerHTML = `
             <td>${formatTime(item.issuedAt)}</td>
             <td>
-                <div style="display: grid; gap: 0.25rem;">
+                <div style="display: grid; gap: 0.4rem;">
                     <div>
                         <strong>Credential configuration</strong><br>
                         <code style="display: inline-block; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${item.credentialConfigurationId || "-"}</code>
@@ -70,17 +66,80 @@
                         <strong>Issuance transaction</strong><br>
                         <code style="display: inline-block; max-width: 100%; overflow-wrap: anywhere; word-break: break-word;">${item.issuanceTransactionId || "-"}</code>
                     </div>
+                    <div>
+                        <button class="ds-button" data-size="sm" data-variant="secondary" type="button">
+                            Revoker
+                        </button>
+                    </div>
                 </div>
             </td>
         `;
 
+        const button = row.querySelector("button");
+        if (button) {
+            button.addEventListener("click", () => revokeEntry(item, button));
+        }
+
         return row;
+    }
+
+    async function revokeEntry(item, button) {
+        const errorMessage = $("recent-issued-error");
+        if (!button) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Revoker...";
+
+        if (errorMessage) {
+            errorMessage.textContent = "";
+            errorMessage.style.display = "none";
+        }
+
+        try {
+            const response = await fetch(REVOKE_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                body: new URLSearchParams({
+                    credentialConfigurationId: item.credentialConfigurationId || "",
+                    issuanceTransactionId: item.issuanceTransactionId || ""
+                })
+            });
+
+            if (response.status !== 204) {
+                throw new Error(`Uventa svar frå revoke-endepunktet: ${response.status}`);
+            }
+
+            removeIssuedEntry(item.issuanceTransactionId);
+            renderHistory();
+        } catch (error) {
+            console.error(error);
+            if (errorMessage) {
+                errorMessage.textContent = "Revokering feila.";
+                errorMessage.style.display = "block";
+            }
+            button.disabled = false;
+            button.textContent = "Revoker";
+        }
+    }
+
+    function initRevokedSyncFromServer() {
+        const state = $("revoke-page-state");
+        if (!state) {
+            return;
+        }
+
+        removeIssuedEntry(state.dataset.revokedIssuanceTransactionId);
     }
 
     function renderHistory() {
         const table = $("recent-issued-table");
         const body = $("recent-issued-body");
         const emptyMessage = $("recent-issued-empty-message");
+        const errorMessage = $("recent-issued-error");
 
         if (!table || !body || !emptyMessage) {
             return;
@@ -90,6 +149,9 @@
         body.innerHTML = "";
         table.style.display = history.length ? "table" : "none";
         emptyMessage.style.display = history.length ? "none" : "block";
+        if (errorMessage && !history.length) {
+            errorMessage.style.display = "none";
+        }
 
         if (!history.length) {
             return;
@@ -110,16 +172,7 @@
         });
     }
 
-    function initRevokedSyncFromServer() {
-        const state = $("revoke-page-state");
-        if (!state) {
-            return;
-        }
-
-        markRevoked(state.dataset.revokedIssuanceTransactionId);
-    }
-
-    window.bevisgeneratorRevokeHistory = {addIssuedEntry, markRevoked, getHistory};
+    window.bevisgeneratorRevokeHistory = {addIssuedEntry, removeIssuedEntry, getHistory, revokeEntry};
 
     initIssuedMetadataCapture();
     initRevokedSyncFromServer();
