@@ -13,28 +13,6 @@
         <h1 class="ds-heading" data-size="lg">
             Revoker utstedte bevis
         </h1>
-        <p class="ds-paragraph">
-            Oversikta viser berre bevis utstedt frå denne nettlesaren.
-        </p>
-    </div>
-
-    <div class="ds-card" style="max-width: 900px">
-        <h2 class="ds-heading" data-size="sm">Nyleg utstedte bevis frå denne nettlesaren</h2>
-        <p class="ds-paragraph" id="recent-issued-empty-message">
-            Ingen utstedte bevis enno.
-        </p>
-        <p id="recent-issued-error" class="ds-validation-message" style="display: none;"></p>
-        <div style="overflow-x: auto;">
-            <table id="recent-issued-table" class="ds-table" style="display: none; min-width: 32rem;">
-                <thead>
-                <tr>
-                    <th scope="col">Tidspunkt</th>
-                    <th scope="col">Detaljer og handling</th>
-                </tr>
-                </thead>
-                <tbody id="recent-issued-body"></tbody>
-            </table>
-        </div>
     </div>
 
     <div class="ds-card" style="max-width: 900px">
@@ -48,6 +26,7 @@
               th:object="${revokeForm}"
               th:action="@{/revoke}"
               method="POST">
+
             <div class="ds-field">
                 <label for="credentialConfigurationId"
                        data-weight="medium"
@@ -56,7 +35,8 @@
                 </label>
                 <select id="credentialConfigurationId"
                         class="ds-input"
-                        th:field="*{credentialConfigurationId}">
+                        th:field="*{credentialConfigurationId}"
+                        th:attr="aria-invalid=${#fields.hasErrors('credentialConfigurationId')}">
                     <option value="">Velg</option>
                     <option th:each="credentialConfiguration : ${credentialConfigurations}"
                             th:value="${credentialConfiguration.credentialConfigurationId()}"
@@ -75,7 +55,8 @@
                 </label>
                 <input id="issuanceTransactionId"
                        class="ds-input"
-                       th:field="*{issuanceTransactionId}" />
+                       th:field="*{issuanceTransactionId}"
+                       th:attr="aria-invalid=${#fields.hasErrors('issuanceTransactionId')}" />
                 <span th:if="${#fields.hasErrors('issuanceTransactionId')}"
                       class="ds-validation-message"
                       th:errors="*{issuanceTransactionId}"></span>
@@ -89,13 +70,8 @@
             </div>
         </form>
     </div>
-
-    <div id="revoke-page-state"
-         th:attr="data-revoked-issuance-transaction-id=${revokedIssuanceTransactionId}">
-    </div>
 </main>
 
 <footer th:replace="~{fragments/general :: page_footer_fragment(issuer=${issuerUrl})}"></footer>
-<script th:src="@{/js/revoke-history.js}"></script>
 </body>
 </html>

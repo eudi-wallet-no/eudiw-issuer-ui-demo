@@ -36,14 +36,7 @@
             <a th:href="@{/issue}" class="ds-button" type="button" data-variant="secondary">
                 Tilbake
             </a>
-            <a th:href="@{/revoke}" class="ds-button" type="button" data-variant="secondary">
-                Revoker utstedte bevis
-            </a>
         </div>
-    </div>
-
-    <div id="issued-metadata"
-         th:attr="data-credential-configuration-id=${issuedCredentialConfigurationId},data-issuance-transaction-id=${issuedTransactionId}">
     </div>
 
     <div id="tracing">
@@ -71,6 +64,5 @@
 </main>
 
 <footer th:replace="~{fragments/general :: page_footer_fragment(issuer=${issuerUrl})}"></footer>
-<script th:src="@{/js/revoke-history.js}"></script>
 </body>
 </html>

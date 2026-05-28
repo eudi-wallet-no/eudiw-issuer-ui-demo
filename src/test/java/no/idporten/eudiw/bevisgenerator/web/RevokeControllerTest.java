@@ -81,8 +81,7 @@ class RevokeControllerTest {
                         .param("issuanceTransactionId", "tx-123"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("revoke"))
-                .andExpect(model().attribute("successMessage", "Beviset blei revokert dersom det eksisterte."))
-                .andExpect(model().attribute("revokedIssuanceTransactionId", "tx-123"));
+                .andExpect(model().attribute("successMessage", "Beviset blei revokert dersom det eksisterte."));
 
         verify(issuerServerService).revokeCredential(eq(credentialConfiguration), eq("tx-123"));
     }
@@ -120,13 +119,4 @@ class RevokeControllerTest {
                 .andExpect(model().attributeExists("errorMessage"));
     }
 
-    @Test
-    void postQuickRevokeReturnsNoContentWhenRevoked() throws Exception {
-        when(issuerServerService.getById(credentialConfiguration.credentialConfigurationId())).thenReturn(credentialConfiguration);
-
-        mockMvc.perform(post("/revoke/quick")
-                        .param("credentialConfigurationId", credentialConfiguration.credentialConfigurationId())
-                        .param("issuanceTransactionId", "tx-123"))
-                .andExpect(status().isNoContent());
-    }
 }

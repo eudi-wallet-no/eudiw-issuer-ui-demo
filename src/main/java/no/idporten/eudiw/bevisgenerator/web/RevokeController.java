@@ -8,8 +8,6 @@ import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerSe
 import no.idporten.eudiw.bevisgenerator.web.models.RevokeForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +39,10 @@ public class RevokeController {
 
     @PostMapping("/revoke")
     public ModelAndView revoke(@Valid @ModelAttribute("revokeForm") RevokeForm revokeForm, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return baseView(revokeForm);
+        }
+
         CredentialConfiguration credentialConfiguration = issuerServerService.getById(revokeForm.credentialConfigurationId());
         if (credentialConfiguration == null) {
             bindingResult.rejectValue("credentialConfigurationId", "notFound", "Credential configuration finnes ikkje");
@@ -55,25 +57,7 @@ public class RevokeController {
         }
 
         return baseView(new RevokeForm())
-                .addObject("successMessage", "Beviset blei revokert dersom det eksisterte.")
-                .addObject("revokedIssuanceTransactionId", revokeForm.issuanceTransactionId());
-    }
-
-    @PostMapping("/revoke/quick")
-    public ResponseEntity<Void> revokeQuick(@Valid @ModelAttribute RevokeForm revokeForm) {
-        CredentialConfiguration credentialConfiguration = issuerServerService.getById(revokeForm.credentialConfigurationId());
-        if (credentialConfiguration == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        try {
-            issuerServerService.revokeCredential(credentialConfiguration, revokeForm.issuanceTransactionId());
-        } catch (IssuerServerException e) {
-            logger.error("Failed to revoke credential", e);
-            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
-        }
-
-        return ResponseEntity.noContent().build();
+                .addObject("successMessage", "Beviset blei revokert dersom det eksisterte.");
     }
 
     private ModelAndView baseView(RevokeForm revokeForm) {
