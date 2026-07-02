@@ -5,7 +5,9 @@ server:
     context-path: /
 
 spring:
-  thread-executor: virtual
+  threads:
+    virtual:
+      enabled: true
   application:
     name: digital-lommebok-bevisgenerator
     environment: default
