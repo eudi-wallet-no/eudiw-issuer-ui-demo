@@ -180,3 +180,11 @@ digdir:
     logging:
       filtering:
         static-resources: true
+
+---
+spring:
+  config:
+    activate:
+      on-cloud-platform: 'kubernetes'
+    import:
+      - 'optional:file:/etc/config/'
