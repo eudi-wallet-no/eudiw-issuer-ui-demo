@@ -82,7 +82,7 @@ class RevokeControllerTest {
                         .param("issuanceTransactionId", "tx-123"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("revoke"))
-                .andExpect(model().attribute("txIdSuccessMessage", "Beviset blei revokert dersom det eksisterte."));
+                .andExpect(model().attribute("txIdSuccessMessage", "Beviset er revokert dersom det eksisterte."));
 
         verify(issuerServerService).revokeCredential(eq(credentialConfiguration), eq("tx-123"));
     }
@@ -129,7 +129,7 @@ class RevokeControllerTest {
                         .param("subjectIdentifier", "abc-123-anything"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("revoke"))
-                .andExpect(model().attribute("subjectSuccessMessage", "Bevis blei revokert dersom dei eksisterte."));
+                .andExpect(model().attribute("subjectSuccessMessage", "Beviset er revokert dersom det eksisterte."));
 
         verify(issuerServerService).revokeCredentialBySubject(eq(credentialConfiguration), eq("abc-123-anything"));
     }
