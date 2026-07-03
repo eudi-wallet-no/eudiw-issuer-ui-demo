@@ -155,7 +155,7 @@ public class IssuerServerService {
                     .uri(revokeEndpoint)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.AUTHORIZATION, "******".formatted(accessToken))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(accessToken))
                     .body(request)
                     .retrieve()
                     .toBodilessEntity();

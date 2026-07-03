@@ -58,7 +58,7 @@ public class RevokeController {
         }
 
         return baseView(new RevokeForm(), new RevokeBySubjectForm())
-                .addObject("txIdSuccessMessage", "Beviset blei revokert dersom det eksisterte.");
+                .addObject("txIdSuccessMessage", "Beviset er revokert dersom det eksisterte.");
     }
 
     @PostMapping("/revoke/by-subject")
@@ -78,7 +78,7 @@ public class RevokeController {
         }
 
         return baseView(new RevokeForm(), new RevokeBySubjectForm())
-                .addObject("subjectSuccessMessage", "Bevis blei revokert dersom det eksisterte.");
+                .addObject("subjectSuccessMessage", "Beviset er revokert dersom det eksisterte.");
     }
 
     private ModelAndView baseView(RevokeForm revokeForm, RevokeBySubjectForm revokeBySubjectForm) {

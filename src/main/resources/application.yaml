@@ -116,7 +116,7 @@ bevisgenerator:
       - credential-configuration-id: no.digdir.eudiw.pid_sd_jwt_vc
         credential-issuer: ${bevisgenerator.issuer-server.credential-issuer-pid}
         description: Norsk ID-bevis (SD-JWT VC)
-        scope: eudiw:no:pid
+        scope: eudiw:eidas2sandkasse:dynamicvc
         person-identifier: 05821098825
         json-request: |
           {
