@@ -162,7 +162,11 @@ public class IssuerServerService {
         } catch (HttpClientErrorException e) {
             throw new IssuerServerException("Configuration error against issuer-server? path=" + revokeEndpoint, e);
         } catch (HttpServerErrorException e) {
-            throw new IssuerServerException("Revoke credential by subject failed for subject_identifier=" + subjectIdentifier, e);
+            throw new IssuerServerException(
+                    "Revoke credential by subject failed for credential_configuration_id="
+                            + credentialConfiguration.credentialConfigurationId(),
+                    e
+            );
         }
     }
 
