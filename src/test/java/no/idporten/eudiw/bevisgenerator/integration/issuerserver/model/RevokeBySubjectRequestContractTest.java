@@ -12,7 +12,7 @@ class RevokeBySubjectRequestContractTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void serializesWithIssuerServerEuw1643FieldNames() throws Exception {
+    void serializesWithIssuerServerFieldNames() {
         RevokeBySubjectRequest revokeBySubjectRequest = new RevokeBySubjectRequest(
                 "no.digdir.eudiw.pid_mso_mdoc",
                 "05821098825"

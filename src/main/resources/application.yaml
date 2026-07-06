@@ -92,7 +92,7 @@ bevisgenerator:
       - credential-configuration-id: no.digdir.eudiw.pid_mso_mdoc
         credential-issuer: ${bevisgenerator.issuer-server.credential-issuer}
         description: Norsk ID-bevis (mdoc push)
-        scope: eudiw:eidas2sandkasse:dynamicvc
+        scope: eudiw:no:pid
         person-identifier: 05821098825
         json-request: |
           {
@@ -116,7 +116,7 @@ bevisgenerator:
       - credential-configuration-id: no.digdir.eudiw.pid_sd_jwt_vc
         credential-issuer: ${bevisgenerator.issuer-server.credential-issuer-pid}
         description: Norsk ID-bevis (SD-JWT VC)
-        scope: eudiw:eidas2sandkasse:dynamicvc
+        scope: eudiw:no:pid
         person-identifier: 05821098825
         json-request: |
           {
