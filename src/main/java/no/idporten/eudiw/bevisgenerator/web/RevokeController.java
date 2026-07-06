@@ -62,7 +62,11 @@ public class RevokeController {
     }
 
     @PostMapping("/revoke/by-subject")
-    public ModelAndView revokeBySubject(@ModelAttribute("revokeBySubjectForm") RevokeBySubjectForm revokeBySubjectForm) {
+    public ModelAndView revokeBySubject(@Valid @ModelAttribute("revokeBySubjectForm") RevokeBySubjectForm revokeBySubjectForm,
+                                        BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return baseView(new RevokeForm(), revokeBySubjectForm);
+        }
         CredentialConfiguration credentialConfiguration = issuerServerService.getById(revokeBySubjectForm.credentialConfigurationId());
         if (credentialConfiguration == null) {
             return baseView(new RevokeForm(), revokeBySubjectForm)
