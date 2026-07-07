@@ -113,19 +113,6 @@ bevisgenerator:
               "expiry_date": "2027-03-12"
             }
           }
-      - credential-configuration-id: no.digdir.eudiw.pid_sd_jwt_vc
-        credential-issuer: ${bevisgenerator.issuer-server.credential-issuer-pid}
-        description: Norsk ID-bevis (SD-JWT VC)
-        scope: eudiw:no:pid
-        person-identifier: 05821098825
-        json-request: |
-          {
-            "credential_issuer": "${bevisgenerator.issuer-server.credential-issuer-pid}",
-            "credential_configuration_id": "no.digdir.eudiw.pid_sd_jwt_vc",
-            "subject": {
-              "identifier": "05821098825"
-            }
-          }
       - credential-configuration-id: org.iso.18013.5.1.mDL_mso_mdoc
         credential-issuer: ${bevisgenerator.issuer-server.credential-issuer}
         description: Førerkort
@@ -160,7 +147,26 @@ bevisgenerator:
               "expiry_date": "2027-03-12"
             }
           }
-# Maskinporten
+
+    # Bevis utstedt i Bevisporten
+    subject-credential-configurations:
+      - credential-configuration-id: proof_of_age
+        credential-issuer: ${bevisgenerator.issuer-server.credential-issuer}
+        description: Aldersbevis
+        scope: proof_of_age
+      - credential-configuration-id: no.digdir.eudiw.pid_mso_mdoc
+        credential-issuer: ${bevisgenerator.issuer-server.credential-issuer-pid}
+        description: Norsk ID-bevis (mdoc)
+        scope: eudiw:no:pid
+      - credential-configuration-id: no.digdir.eudiw.pid_sd_jwt_vc
+        credential-issuer: ${bevisgenerator.issuer-server.credential-issuer-pid}
+        description: Norsk ID-bevis (SD-JWT VC)
+        scope: eudiw:no:pid
+      - credential-configuration-id: no.skatteetaten.inntekt_sd_jwt_vc
+        credential-issuer: ${bevisgenerator.issuer-server.credential-issuer}
+        description: Inntektsbevis
+        scope: eudiw:no:skatteetaten:inntekt
+
 maskinporten:
   lib:
     enabled: true
@@ -173,7 +179,7 @@ maskinporten:
         audience:
           - ${maskinporten.lib.issuer}
         token-endpoint: ${maskinporten.lib.issuer}token
-        scope: eudiw:no:pid eudiw:no:skatteetaten:nnid eudiw:no:minid:mpid eudiw:no:advokattilsynet:advokatregisteret eudiw:no:kontaktregisteret:kontaktinformasjon eudiw:no:vegvesen:mdl eudiw:eidas2sandkasse:dynamicvc
+        scope: eudiw:no:pid eudiw:no:skatteetaten:nnid eudiw:no:skatteetaten:inntekt eudiw:no:minid:mpid eudiw:no:advokattilsynet:advokatregisteret eudiw:no:kontaktregisteret:kontaktinformasjon eudiw:no:vegvesen:mdl eudiw:eidas2sandkasse:dynamicvc
         connect-timeout-ms: 5000
         read-timeout-ms: 2000
         key-store-name: default
