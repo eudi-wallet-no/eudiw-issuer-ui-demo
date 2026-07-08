@@ -13,6 +13,11 @@
         </h1>
         <div>
             <h2 class="ds-heading" data-size="md">Velg bevistype</h2>
+            <form th:action="@{/verification-start}" th:object="${verification-form}" method="post">
+                <select th:field="*{credentialType}">
+                    <option th:each="credential : ${credentialConfigurations}" th:value="${credential.id}" th:text="${credential.name}"></option>
+                </select>
+            </form>
         </div>
     </div>
 </main>
