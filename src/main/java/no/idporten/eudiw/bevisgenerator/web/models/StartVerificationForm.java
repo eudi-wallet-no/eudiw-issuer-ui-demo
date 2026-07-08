@@ -6,9 +6,38 @@ public record StartVerificationForm(
         @NotBlank(message = "Credential configuration må velgast")
         String credentialConfigurationId,
         @NotBlank(message = "DCQL query må ha verdi")
-        String dcql
+        String dcqlQuery
 ) {
     public StartVerificationForm() {
-        this("", "");
+        this("", """
+                "credentials": [
+                    {
+                      "meta": {
+                        "vct_values": [
+                          "no:kontaktregisteret:kontaktinformasjon:1"
+                        ]
+                      },
+                      "format": "dc+sd-jwt",
+                      "claims": [
+                        {
+                          "path": [
+                            "personidentifikator"
+                          ]
+                        },
+                        {
+                          "path": [
+                            "epostadresse"
+                          ]
+                        },
+                        {
+                          "path": [
+                            "mobiltelefonnummer"
+                          ]
+                        }
+                      ],
+                      "id": "kontaktregisteret"
+                    }
+                  ]
+                }""");
     }
 }

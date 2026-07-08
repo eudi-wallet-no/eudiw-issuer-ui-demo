@@ -31,12 +31,12 @@ public class VerificationController {
         return properties.credentialIssuer();
     }
 
-    @GetMapping("verification-start")
+    @GetMapping("/verification-start")
     public ModelAndView verify() {
         return baseView(new StartVerificationForm());
     }
 
-    @PostMapping("verification-start")
+    @PostMapping("/verification-start")
     public ModelAndView startVerification(@Valid @ModelAttribute("verificationForm") StartVerificationForm form,
                                           BindingResult bindingResult) {
         ModelAndView view = baseView(form);
