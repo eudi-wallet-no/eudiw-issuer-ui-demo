@@ -1,6 +1,13 @@
 package no.idporten.eudiw.bevisgenerator.web.models;
 
-public record StartVerificationForm(String credentialType, String dcql)  {
+import jakarta.validation.constraints.NotBlank;
+
+public record StartVerificationForm(
+        @NotBlank(message = "Credential configuration må velgast")
+        String credentialConfigurationId,
+        @NotBlank(message = "DCQL query må ha verdi")
+        String dcql
+) {
     public StartVerificationForm() {
         this("", "");
     }
