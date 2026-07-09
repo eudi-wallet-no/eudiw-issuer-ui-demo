@@ -5,6 +5,7 @@ import no.idporten.eudiw.bevisgenerator.integration.issuerserver.IssuerServerSer
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.CredentialConfiguration;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerServerProperties;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationResult;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import no.idporten.eudiw.bevisgenerator.web.models.StartVerificationForm;
@@ -65,6 +66,12 @@ public class VerificationController {
     @GetMapping("/verification-presentation")
     public ModelAndView verificationPresentation() {
         return new ModelAndView("verification-presentation");
+    }
+
+    @GetMapping("/verification-result")
+    public ModelAndView verificationResult(String transactionId) {
+        VerificationResult result = verifierService.retrieveVerificationResult(transactionId);
+        return new ModelAndView("verification-result").addObject("result", result);
     }
 
     private ModelAndView baseView(StartVerificationForm form) {

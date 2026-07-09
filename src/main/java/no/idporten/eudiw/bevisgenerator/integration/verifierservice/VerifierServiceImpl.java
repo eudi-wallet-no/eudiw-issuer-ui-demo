@@ -3,6 +3,7 @@ package no.idporten.eudiw.bevisgenerator.integration.verifierservice;
 import no.idporten.eudiw.bevisgenerator.exception.VerifierServiceException;
 import no.idporten.eudiw.bevisgenerator.exception.VerifierServiceIOException;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.config.VerificationProperties;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationResult;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -54,4 +55,20 @@ public class VerifierServiceImpl implements VerifierService {
             throw new VerifierServiceException("Configuration error against Verifier-service? path=" + verificationProperties.verificationStartEndpoint(), e);
         }
    }
+
+    @Override
+    public VerificationResult retrieveVerificationResult(String transactionId) {
+        try {
+            return restClient
+                    .get()
+                    .uri(verificationProperties.verificationResultEndpoint(), verificationProperties.clientApplicationId(), transactionId)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .body(VerificationResult.class);
+        } catch (ResourceAccessException e) {
+            throw new VerifierServiceIOException("IO error when calling Verifier service to retrieve verification result", e);
+        } catch (RestClientException e) {
+            throw new VerifierServiceException("Configuration error against Verifier-service? path=" + verificationProperties.verificationResultEndpoint(), e);
+        }
+    }
 }

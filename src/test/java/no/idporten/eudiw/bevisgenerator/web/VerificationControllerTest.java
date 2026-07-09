@@ -5,6 +5,7 @@ import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.Credenti
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerServerProperties;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,6 +14,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.view.InternalResourceView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.URI;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItems;
@@ -61,7 +63,11 @@ class VerificationControllerTest {
         when(issuerServerService.getAll()).thenReturn(List.of(issuanceConfig));
         when(issuerServerService.getAllSubjectCredentialConfigurations()).thenReturn(List.of(subjectConfig));
         when(verifierService.startVerification(anyString())).thenReturn(
-                new VerificationStartResponse("eudi-openid4vp://example", "data:image/png;base64,abc123", "tx-id"));
+                new VerificationTransactionData(
+                new VerificationStartResponse("eudi-openid4vp://example", "data:image/png;base64,abc123", "tx-id"),
+                        URI.create("http://verifier/status/tx-id"),
+                        URI.create("http://verifier/result/tx-id")
+                ));
 
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
