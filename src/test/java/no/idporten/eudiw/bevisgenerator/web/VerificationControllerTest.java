@@ -101,7 +101,7 @@ class VerificationControllerTest {
     void postVerificationStartWithValidInputRedirectsToPresentation() throws Exception {
         mockMvc.perform(post("/verification-start")
                         .param("credentialConfigurationId", issuanceConfig.credentialConfigurationId())
-                        .param("dcqlQuery", "{\"credentials\":[{\"id\":\"pid\"}]}"))
+                        .param("dcql", "{\"credentials\":[{\"id\":\"pid\"}]}"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/verification-presentation"))
                 .andExpect(flash().attributeExists("qrCode"))
@@ -112,7 +112,7 @@ class VerificationControllerTest {
     void postVerificationStartWithBlankCredentialConfigurationIdFailsValidation() throws Exception {
         mockMvc.perform(post("/verification-start")
                         .param("credentialConfigurationId", "")
-                        .param("dcqlQuery", "{\"credentials\":[{\"id\":\"pid\"}]}"))
+                        .param("dcql", "{\"credentials\":[{\"id\":\"pid\"}]}"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("verification-start"))
                 .andExpect(model().attributeHasFieldErrors("verificationForm", "credentialConfigurationId"))
@@ -123,10 +123,10 @@ class VerificationControllerTest {
     void postVerificationStartWithBlankDcqlFailsValidation() throws Exception {
         mockMvc.perform(post("/verification-start")
                         .param("credentialConfigurationId", issuanceConfig.credentialConfigurationId())
-                        .param("dcqlQuery", ""))
+                        .param("dcql", ""))
                 .andExpect(status().isOk())
                 .andExpect(view().name("verification-start"))
-                .andExpect(model().attributeHasFieldErrors("verificationForm", "dcqlQuery"))
+                .andExpect(model().attributeHasFieldErrors("verificationForm", "dcql"))
                 .andExpect(model().attributeDoesNotExist("verificationSuccessMessage"));
     }
 
@@ -134,17 +134,17 @@ class VerificationControllerTest {
     void postVerificationStartWithBothFieldsBlankFailsValidationOnBoth() throws Exception {
         mockMvc.perform(post("/verification-start")
                         .param("credentialConfigurationId", "")
-                        .param("dcqlQuery", ""))
+                        .param("dcql", ""))
                 .andExpect(status().isOk())
                 .andExpect(view().name("verification-start"))
-                .andExpect(model().attributeHasFieldErrors("verificationForm", "credentialConfigurationId", "dcqlQuery"));
+                .andExpect(model().attributeHasFieldErrors("verificationForm", "credentialConfigurationId", "dcql"));
     }
 
     @Test
     void postVerificationStartReturnsCredentialConfigurationsOnValidationError() throws Exception {
         mockMvc.perform(post("/verification-start")
                         .param("credentialConfigurationId", "")
-                        .param("dcqlQuery", ""))
+                        .param("dcql", ""))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("credentialConfigurations", hasSize(2)));
     }

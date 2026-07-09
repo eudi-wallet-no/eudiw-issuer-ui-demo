@@ -4,11 +4,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClientException;
 
-public class ByobServiceException extends RuntimeException {
+public class VerifierServiceException extends RuntimeException {
 
     private final RestClientException restClientResponseException;
 
-     public ByobServiceException(String message, RestClientException cause) {
+     public VerifierServiceException(String message, RestClientException cause) {
         super(message, cause);
         restClientResponseException = cause;
     }

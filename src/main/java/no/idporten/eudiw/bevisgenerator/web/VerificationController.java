@@ -6,6 +6,7 @@ import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.Credenti
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerServerProperties;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import no.idporten.eudiw.bevisgenerator.web.models.StartVerificationForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -50,11 +51,14 @@ public class VerificationController {
             return view;
         }
 
-        VerificationStartResponse response = verifierService.startVerification(form.dcqlQuery());
+        VerificationTransactionData verificationTransactionData = verifierService.startVerification(form.dcql());
 
-        redirectAttributes.addFlashAttribute("qrCode", response.authorizationRequestQrCode());
-        redirectAttributes.addFlashAttribute("authorizationRequest", response.authorizationRequest());
-        redirectAttributes.addFlashAttribute("transactionId", response.verifierTransactionId());
+        redirectAttributes.addFlashAttribute("qrCode", verificationTransactionData.verificationStartResponse().authorizationRequestQrCode());
+        redirectAttributes.addFlashAttribute("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest());
+        redirectAttributes.addFlashAttribute("transactionId", verificationTransactionData.verificationStartResponse().verifierTransactionId());
+        redirectAttributes.addFlashAttribute("statusUri", verificationTransactionData.statusUri());
+        redirectAttributes.addFlashAttribute("statusUri", verificationTransactionData.statusUri());
+
         return new ModelAndView("redirect:/verification-presentation");
     }
 
