@@ -20,6 +20,9 @@
             <a th:href="${authorizationRequest}" class="ds-button" type="button" data-variant="primary" style="min-width:75px">
                 Opne på mobilen
             </a>
+            <a th:href="@{/verification-result(transactionId=${transactionId})}" class="ds-button" type="button" data-variant="primary">
+                Sjå resultat
+            </a>
             <a th:href="@{/verification-start}" class="ds-button" type="button" data-variant="secondary">
                 Tilbake
             </a>

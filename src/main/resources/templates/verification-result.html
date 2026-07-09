@@ -13,7 +13,19 @@
         </h1>
     </div>
     <div class="ds-card" style="max-width: 600px">
-
+        <div th:if="${result != null}">
+            <p><strong>Transaction ID:</strong> <span th:text="${result.verifierTransactionId}"></span></p>
+            <p><strong>Credentials:</strong></p>
+            <pre th:text="${result.credentials}"></pre>
+        </div>
+        <div th:if="${result == null}">
+            <p>Ingen resultat funne.</p>
+        </div>
+        <div class="flex-container" style="min-width: unset; margin-top: var(--ds-size-4)">
+            <a th:href="@{/verification-start}" class="ds-button" type="button" data-variant="secondary">
+                Tilbake
+            </a>
+        </div>
     </div>
 </main>
 <footer th:replace="~{fragments/general :: page_footer_fragment(issuer=${issuerUrl})}"></footer>
