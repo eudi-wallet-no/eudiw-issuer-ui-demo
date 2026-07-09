@@ -40,8 +40,7 @@ public record StartVerificationForm(
                         "id": "kontaktregisteret"
                       }
                     ]
-                  },
-                  "redirect_uri": "https://app.eidas2sandkasse.dev/verification-ok"
+                  }
                 }""");
     }
 }

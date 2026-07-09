@@ -25,27 +25,33 @@ public class VerifierServiceImpl implements VerifierService {
     }
 
     @Override
-    public VerificationTransactionData startVerification(String dcqlQuery) {
-        VerificationStartResponse response;
-
+    public VerificationTransactionData startVerification(String dcql) {
         try {
-            response = restClient
+            VerificationStartResponse response = restClient
                     .post()
                     .uri(verificationProperties.verificationStartEndpoint(), verificationProperties.clientApplicationId())
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(dcqlQuery)
+                    .body(dcql)
                     .retrieve()
                     .body(VerificationStartResponse.class);
+
+
+            URI statusUri = URI.create(verificationProperties.baseUrl() +
+                    verificationProperties.verificationStatusEndpoint()
+                            .replace("{client_application_id}", verificationProperties.clientApplicationId())
+                            .replace("{verifier_transaction_id}", response.verifierTransactionId()));
+            URI responseUri = URI.create(verificationProperties.baseUrl() +
+                    verificationProperties.verificationResultEndpoint()
+                            .replace("{client_application_id}", verificationProperties.clientApplicationId())
+                            .replace("{verifier_transaction_id}", response.verifierTransactionId()));
+
+            return new VerificationTransactionData(response, statusUri, responseUri);
+
         } catch (ResourceAccessException e) {
             throw new VerifierServiceIOException("IO error when calling Verifier service to start verification", e);
         } catch (RestClientException e) {
             throw new VerifierServiceException("Configuration error against Verifier-service? path=" + verificationProperties.verificationStartEndpoint(), e);
         }
-
-        URI statusUri = URI.create(verificationProperties.baseUrl() + verificationProperties.verificationStatusEndpoint());
-        URI responseUri = URI.create(verificationProperties.baseUrl() + verificationProperties.verificationResultEndpoint());
-
-        return new VerificationTransactionData(response, statusUri, responseUri);
    }
 }
