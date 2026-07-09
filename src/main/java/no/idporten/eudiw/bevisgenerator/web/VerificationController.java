@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.IssuerServerService;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.CredentialConfiguration;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerServerProperties;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import no.idporten.eudiw.bevisgenerator.web.models.StartVerificationForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -20,10 +22,12 @@ public class VerificationController {
 
     private final IssuerServerService issuerServerService;
     private final IssuerServerProperties properties;
+    private final VerifierService verifierService;
 
-    public VerificationController(IssuerServerService issuerServerService, IssuerServerProperties properties) {
+    public VerificationController(IssuerServerService issuerServerService, IssuerServerProperties properties, VerifierService verifierService) {
         this.issuerServerService = issuerServerService;
         this.properties = properties;
+        this.verifierService = verifierService;
     }
 
     @ModelAttribute("issuerUrl")
@@ -43,7 +47,11 @@ public class VerificationController {
         if (bindingResult.hasErrors()) {
             return view;
         }
-        return view.addObject("verificationSuccessMessage", "DCQL query er registrert.");
+
+        VerificationStartResponse response = verifierService.startVerification(form.dcqlQuery());
+
+        return new ModelAndView("redirect:/verification-presentation")
+                .addObject("qrCode", response.authorizationRequestQrCode());
     }
 
     private ModelAndView baseView(StartVerificationForm form) {

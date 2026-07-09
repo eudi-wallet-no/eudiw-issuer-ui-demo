@@ -3,6 +3,7 @@ package no.idporten.eudiw.bevisgenerator.web;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.IssuerServerService;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.CredentialConfiguration;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerServerProperties;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +33,7 @@ class VerificationControllerTest {
     void setUp() {
         IssuerServerService issuerServerService = mock(IssuerServerService.class);
         IssuerServerProperties issuerServerProperties = mock(IssuerServerProperties.class);
+        VerifierService verifierService = mock(VerifierService.class);
 
         issuanceConfig = new CredentialConfiguration(
                 "http://issuer",
@@ -57,7 +59,7 @@ class VerificationControllerTest {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
 
-        mockMvc = MockMvcBuilders.standaloneSetup(new VerificationController(issuerServerService, issuerServerProperties))
+        mockMvc = MockMvcBuilders.standaloneSetup(new VerificationController(issuerServerService, issuerServerProperties, verifierService))
                 .setValidator(validator)
                 .setViewResolvers((viewName, locale) -> {
                     InternalResourceView view = new InternalResourceView();
