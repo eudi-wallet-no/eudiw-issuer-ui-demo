@@ -9,7 +9,7 @@ public class VerifierServiceImpl implements VerifierService {
     @Override
     public VerificationStartResponse startVerification(String dcqlQuery) {
 
-        
+
 
         return getDummyResponse();
    }
