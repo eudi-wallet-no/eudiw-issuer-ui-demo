@@ -4,22 +4,27 @@ import no.idporten.eudiw.bevisgenerator.integration.issuerserver.IssuerServerSer
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.CredentialConfiguration;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerServerProperties;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.view.InternalResourceView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -55,6 +60,8 @@ class VerificationControllerTest {
         when(issuerServerProperties.credentialIssuer()).thenReturn("http://issuer");
         when(issuerServerService.getAll()).thenReturn(List.of(issuanceConfig));
         when(issuerServerService.getAllSubjectCredentialConfigurations()).thenReturn(List.of(subjectConfig));
+        when(verifierService.startVerification(anyString())).thenReturn(
+                new VerificationStartResponse("eudi-openid4vp://example", "data:image/png;base64,abc123", "tx-id"));
 
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
@@ -62,6 +69,9 @@ class VerificationControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(new VerificationController(issuerServerService, issuerServerProperties, verifierService))
                 .setValidator(validator)
                 .setViewResolvers((viewName, locale) -> {
+                    if (viewName.startsWith("redirect:")) {
+                        return new RedirectView(viewName.substring("redirect:".length()));
+                    }
                     InternalResourceView view = new InternalResourceView();
                     view.setUrl("/templates/" + viewName + ".html");
                     return view;
@@ -88,14 +98,14 @@ class VerificationControllerTest {
     }
 
     @Test
-    void postVerificationStartWithValidInputReturnsSuccessMessage() throws Exception {
+    void postVerificationStartWithValidInputRedirectsToPresentation() throws Exception {
         mockMvc.perform(post("/verification-start")
                         .param("credentialConfigurationId", issuanceConfig.credentialConfigurationId())
                         .param("dcqlQuery", "{\"credentials\":[{\"id\":\"pid\"}]}"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("verification-start"))
-                .andExpect(model().attribute("verificationSuccessMessage", "DCQL query er registrert."))
-                .andExpect(model().attributeExists("credentialConfigurations"));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/verification-presentation"))
+                .andExpect(flash().attributeExists("qrCode"))
+                .andExpect(flash().attributeExists("authorizationRequest"));
     }
 
     @Test

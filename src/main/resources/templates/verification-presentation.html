@@ -12,6 +12,19 @@
             Presenter bevis
         </h1>
     </div>
+    <div class="ds-card" style="max-width: 600px">
+        <div id="cross-device-request">
+            <img th:src="${qrCode}" alt="QR kode for verifikasjon" id="qrcode-cross-device" width="100%"/>
+        </div>
+        <div class="flex-container" style="min-width: unset">
+            <a th:href="${authorizationRequest}" class="ds-button" type="button" data-variant="primary" style="min-width:75px">
+                Opne på mobilen
+            </a>
+            <a th:href="@{/verification-start}" class="ds-button" type="button" data-variant="secondary">
+                Tilbake
+            </a>
+        </div>
+    </div>
 </main>
 <footer th:replace="~{fragments/general :: page_footer_fragment(issuer=${issuerUrl})}"></footer>
 </body>

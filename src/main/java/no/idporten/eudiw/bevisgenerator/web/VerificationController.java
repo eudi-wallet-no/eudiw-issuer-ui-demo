@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,8 @@ public class VerificationController {
 
     @PostMapping("/verification-start")
     public ModelAndView startVerification(@Valid @ModelAttribute("verificationForm") StartVerificationForm form,
-                                          BindingResult bindingResult) {
+                                          BindingResult bindingResult,
+                                          RedirectAttributes redirectAttributes) {
         ModelAndView view = baseView(form);
         if (bindingResult.hasErrors()) {
             return view;
@@ -50,8 +52,15 @@ public class VerificationController {
 
         VerificationStartResponse response = verifierService.startVerification(form.dcqlQuery());
 
-        return new ModelAndView("redirect:/verification-presentation")
-                .addObject("qrCode", response.authorizationRequestQrCode());
+        redirectAttributes.addFlashAttribute("qrCode", response.authorizationRequestQrCode());
+        redirectAttributes.addFlashAttribute("authorizationRequest", response.authorizationRequest());
+        redirectAttributes.addFlashAttribute("transactionId", response.verifierTransactionId());
+        return new ModelAndView("redirect:/verification-presentation");
+    }
+
+    @GetMapping("/verification-presentation")
+    public ModelAndView verificationPresentation() {
+        return new ModelAndView("verification-presentation");
     }
 
     private ModelAndView baseView(StartVerificationForm form) {
