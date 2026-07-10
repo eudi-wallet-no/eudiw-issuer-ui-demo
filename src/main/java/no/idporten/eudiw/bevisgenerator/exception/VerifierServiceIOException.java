@@ -1,8 +1,8 @@
 package no.idporten.eudiw.bevisgenerator.exception;
 
-public class VerifierServiceIOException extends RuntimeException {
+public class VerifierServiceIOException extends VerifierServiceException {
 
-     public VerifierServiceIOException(String message, RuntimeException cause) {
+     public VerifierServiceIOException(String message, Throwable cause) {
         super(message, cause);
     }
 }

@@ -7,12 +7,16 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.Verifi
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import java.io.IOException;
 import java.net.URI;
 
 @Service
@@ -55,6 +59,7 @@ public class VerifierServiceImpl implements VerifierService {
                     .uri(verificationProperties.verificationResultEndpoint(), verificationProperties.clientApplicationId(), transactionId)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
+                    .onStatus(VerifierServiceImpl::handleErrorStatus)
                     .body(VerificationResult.class);
         } catch (ResourceAccessException e) {
             throw new VerifierServiceIOException("IO error when calling Verifier service to retrieve verification result", e);
@@ -69,7 +74,6 @@ public class VerifierServiceImpl implements VerifierService {
         return result;
     }
 
-
     private VerificationStartResponse getVerificationStartResponse(String dcql) {
         String apiRequest = buildApiRequest(dcql);
 
@@ -81,9 +85,8 @@ public class VerifierServiceImpl implements VerifierService {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(apiRequest)
                     .retrieve()
+                    .onStatus(VerifierServiceImpl::handleErrorStatus)
                     .body(VerificationStartResponse.class);
-
-
         } catch (ResourceAccessException e) {
             throw new VerifierServiceIOException("IO error when calling Verifier service to start verification", e);
         } catch (RestClientException e) {
@@ -96,5 +99,15 @@ public class VerifierServiceImpl implements VerifierService {
                 {
                   "dcql_query": %s
                 }""".formatted(dcql);
+    }
+
+    private static boolean handleErrorStatus(ClientHttpResponse clientHttpResponse) throws IOException {
+        HttpStatusCode status = clientHttpResponse.getStatusCode();
+        if (status.is4xxClientError()) {
+            throw new VerifierServiceException("Verifier service returned 4xx error", HttpStatus.BAD_REQUEST);
+        } else if (status.is5xxServerError()) {
+            throw new VerifierServiceException("Verifier service returned 5xx error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return true;
     }
 }
