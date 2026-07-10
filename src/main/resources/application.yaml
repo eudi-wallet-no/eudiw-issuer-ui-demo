@@ -34,6 +34,7 @@ management:
 bevisgenerator:
   features:
     allow-bevistyper-v2: true
+    allow-verification: true
   byob-service:
     create-endpoint: /v1/public/credential-configurations
     get-all-edit-endpoint: /v1/public/credential-configurations
