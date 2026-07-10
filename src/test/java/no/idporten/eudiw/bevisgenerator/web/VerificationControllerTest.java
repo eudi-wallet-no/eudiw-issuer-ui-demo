@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.view.InternalResourceView;
 import org.springframework.web.servlet.view.RedirectView;
+import tools.jackson.databind.ObjectMapper;
 
 import java.net.URI;
 import java.util.List;
@@ -24,11 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class VerificationControllerTest {
 
@@ -41,6 +38,7 @@ class VerificationControllerTest {
         IssuerServerService issuerServerService = mock(IssuerServerService.class);
         IssuerServerProperties issuerServerProperties = mock(IssuerServerProperties.class);
         VerifierService verifierService = mock(VerifierService.class);
+        ObjectMapper objectMapper = mock(ObjectMapper.class);
 
         issuanceConfig = new CredentialConfiguration(
                 "http://issuer",
@@ -72,7 +70,7 @@ class VerificationControllerTest {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
 
-        mockMvc = MockMvcBuilders.standaloneSetup(new VerificationController(issuerServerService, issuerServerProperties, verifierService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new VerificationController(issuerServerService, issuerServerProperties, verifierService, objectMapper))
                 .setValidator(validator)
                 .setViewResolvers((viewName, locale) -> {
                     if (viewName.startsWith("redirect:")) {

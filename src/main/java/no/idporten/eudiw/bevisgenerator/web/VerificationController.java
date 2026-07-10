@@ -7,7 +7,6 @@ import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.Credenti
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerServerProperties;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationResult;
-import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import no.idporten.eudiw.bevisgenerator.web.models.StartVerificationForm;
 import org.springframework.stereotype.Controller;
@@ -31,7 +30,12 @@ public class VerificationController {
     private final VerifierService verifierService;
     private final ObjectMapper objectMapper;
 
-    public VerificationController(IssuerServerService issuerServerService, IssuerServerProperties properties, VerifierService verifierService, ObjectMapper objectMapper) {
+    public VerificationController(
+            IssuerServerService issuerServerService,
+            IssuerServerProperties properties,
+            VerifierService verifierService,
+            ObjectMapper objectMapper
+    ) {
         this.issuerServerService = issuerServerService;
         this.properties = properties;
         this.verifierService = verifierService;
