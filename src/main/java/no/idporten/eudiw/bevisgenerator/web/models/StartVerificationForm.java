@@ -10,8 +10,7 @@ public record StartVerificationForm(
 ) {
     public StartVerificationForm() {
         this("", """
-                {
-                  "dcql_query": {
+                 {
                     "credentials": [
                       {
                         "meta": {
@@ -40,7 +39,6 @@ public record StartVerificationForm(
                         "id": "kontaktregisteret"
                       }
                     ]
-                  }
-                }""");
+                  }""");
     }
 }

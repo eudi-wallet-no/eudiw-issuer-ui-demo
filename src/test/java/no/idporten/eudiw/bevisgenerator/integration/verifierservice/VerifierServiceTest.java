@@ -8,7 +8,6 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.Verifi
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -21,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.RETURNS_SELF;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,22 +51,18 @@ public class VerifierServiceTest {
         verifierService = new VerifierServiceImpl(restClient, verificationProperties);
 
         requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        requestBodySpec = mock(RestClient.RequestBodySpec.class);
+        requestBodySpec = mock(RestClient.RequestBodySpec.class, RETURNS_SELF);
         requestHeadersUriSpec = mock(RestClient.RequestHeadersUriSpec.class);
-        requestHeadersSpec = mock(RestClient.RequestHeadersSpec.class);
+        requestHeadersSpec = mock(RestClient.RequestHeadersSpec.class, RETURNS_SELF);
         responseSpec = mock(RestClient.ResponseSpec.class);
 
         when(restClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri("/verifier/{client_application_id}/start", "client-123")).thenReturn(requestBodySpec);
-        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body("{\"credentials\":[]}")).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
 
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri("/verifier/{client_application_id}/result/{verifier_transaction_id}", "client-123", "tx-id"))
                 .thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
     }
 
@@ -161,5 +157,17 @@ public class VerifierServiceTest {
                 exception.getMessage()
         );
         assertInstanceOf(RestClientException.class, exception.getCause());
+    }
+
+    @Test
+    void retrieveVerificationResultThrowsVerifierServiceExceptionWhenResponseIsNull() {
+        when(responseSpec.body(VerificationResult.class)).thenReturn(null);
+
+        VerifierServiceException exception = assertThrows(
+                VerifierServiceException.class,
+                () -> verifierService.retrieveVerificationResult("tx-id")
+        );
+
+        assertEquals("Verification result returned null", exception.getMessage());
     }
 }

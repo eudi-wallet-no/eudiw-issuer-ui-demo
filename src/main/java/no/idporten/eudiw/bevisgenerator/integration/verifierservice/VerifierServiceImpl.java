@@ -71,13 +71,15 @@ public class VerifierServiceImpl implements VerifierService {
 
 
     private VerificationStartResponse getVerificationStartResponse(String dcql) {
+        String apiRequest = buildApiRequest(dcql);
+
         try {
             return restClient
                     .post()
                     .uri(verificationProperties.verificationStartEndpoint(), verificationProperties.clientApplicationId())
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(dcql)
+                    .body(apiRequest)
                     .retrieve()
                     .body(VerificationStartResponse.class);
 
@@ -87,5 +89,12 @@ public class VerifierServiceImpl implements VerifierService {
         } catch (RestClientException e) {
             throw new VerifierServiceException("Configuration error against Verifier-service? path=" + verificationProperties.verificationStartEndpoint(), e);
         }
+    }
+
+    private String buildApiRequest(String dcql) {
+        return """
+                {
+                  "dcql_query": %s
+                }""".formatted(dcql);
     }
 }
