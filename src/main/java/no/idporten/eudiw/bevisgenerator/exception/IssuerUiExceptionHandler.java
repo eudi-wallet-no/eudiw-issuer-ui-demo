@@ -55,7 +55,10 @@ public class IssuerUiExceptionHandler {
     @ExceptionHandler(VerifierServiceException.class)
     public ModelAndView handleVerifierServiceException(VerifierServiceException e) {
         log.error("Unexpected error from verifier-service", e);
-        return getModelAndView("error/error").addObject("errorMessage", "Failed to connect with verifier-service").addObject("statusCode", e.getHttpStatusCode()).addObject("details", e.getMessage());
+        return getModelAndView("error/error")
+                .addObject("errorMessage", "Verifier-service call failed")
+                .addObject("statusCode", e.getHttpStatusCode())
+                .addObject("details", e.getMessage());
     }
 
     @ExceptionHandler(VerifierServiceIOException.class)
