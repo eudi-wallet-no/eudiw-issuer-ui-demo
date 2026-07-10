@@ -56,9 +56,9 @@ public class VerificationController {
     public ModelAndView startVerification(@Valid @ModelAttribute("verificationForm") StartVerificationForm form,
                                           BindingResult bindingResult,
                                           RedirectAttributes redirectAttributes) {
-        ModelAndView view = baseView(form);
+
         if (bindingResult.hasErrors()) {
-            return view;
+            return baseView(form);
         }
 
         VerificationTransactionData verificationTransactionData = verifierService.startVerification(form.dcql());
@@ -66,7 +66,6 @@ public class VerificationController {
         redirectAttributes.addFlashAttribute("qrCode", verificationTransactionData.verificationStartResponse().authorizationRequestQrCode());
         redirectAttributes.addFlashAttribute("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest());
         redirectAttributes.addFlashAttribute("transactionId", verificationTransactionData.verificationStartResponse().verifierTransactionId());
-        redirectAttributes.addFlashAttribute("statusUri", verificationTransactionData.statusUri());
         redirectAttributes.addFlashAttribute("statusUri", verificationTransactionData.statusUri());
 
         return new ModelAndView("redirect:/verification-presentation");
@@ -79,6 +78,10 @@ public class VerificationController {
 
     @GetMapping("/verification-result")
     public ModelAndView verificationResult(String transactionId) {
+        if (transactionId == null || transactionId.isBlank()) {
+            throw new IssuerUiException("Missing transactionId");
+        }
+
         VerificationResult result = verifierService.retrieveVerificationResult(transactionId);
         return new ModelAndView("verification-result")
                 .addObject("result", result)

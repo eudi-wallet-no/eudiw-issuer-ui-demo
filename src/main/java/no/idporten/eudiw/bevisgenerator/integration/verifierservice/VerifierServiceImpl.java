@@ -6,7 +6,6 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.config.Verif
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationResult;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
-import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -49,8 +48,9 @@ public class VerifierServiceImpl implements VerifierService {
 
     @Override
     public VerificationResult retrieveVerificationResult(String transactionId) {
+        VerificationResult result;
         try {
-            return restClient
+            result = restClient
                     .get()
                     .uri(verificationProperties.verificationResultEndpoint(), verificationProperties.clientApplicationId(), transactionId)
                     .accept(MediaType.APPLICATION_JSON)
@@ -61,13 +61,18 @@ public class VerifierServiceImpl implements VerifierService {
         } catch (RestClientException e) {
             throw new VerifierServiceException("Configuration error against Verifier-service? path=" + verificationProperties.verificationResultEndpoint(), e);
         }
+
+        if (result == null) {
+            throw new VerifierServiceException("Verification result returned null");
+        }
+
+        return result;
     }
 
 
-    private @Nullable VerificationStartResponse getVerificationStartResponse(String dcql) {
-        VerificationStartResponse response;
+    private VerificationStartResponse getVerificationStartResponse(String dcql) {
         try {
-            response = restClient
+            return restClient
                     .post()
                     .uri(verificationProperties.verificationStartEndpoint(), verificationProperties.clientApplicationId())
                     .accept(MediaType.APPLICATION_JSON)
@@ -82,6 +87,5 @@ public class VerifierServiceImpl implements VerifierService {
         } catch (RestClientException e) {
             throw new VerifierServiceException("Configuration error against Verifier-service? path=" + verificationProperties.verificationStartEndpoint(), e);
         }
-        return response;
     }
 }
