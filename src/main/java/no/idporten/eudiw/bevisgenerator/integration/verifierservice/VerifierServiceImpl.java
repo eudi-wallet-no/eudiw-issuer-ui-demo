@@ -6,6 +6,7 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.config.Verif
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationResult;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -27,34 +28,24 @@ public class VerifierServiceImpl implements VerifierService {
 
     @Override
     public VerificationTransactionData startVerification(String dcql) {
-        try {
-            VerificationStartResponse response = restClient
-                    .post()
-                    .uri(verificationProperties.verificationStartEndpoint(), verificationProperties.clientApplicationId())
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(dcql)
-                    .retrieve()
-                    .body(VerificationStartResponse.class);
+        VerificationStartResponse response = getVerificationStartResponse(dcql);
 
-
-            URI statusUri = URI.create(verificationProperties.baseUrl() +
-                    verificationProperties.verificationStatusEndpoint()
-                            .replace("{client_application_id}", verificationProperties.clientApplicationId())
-                            .replace("{verifier_transaction_id}", response.verifierTransactionId()));
-            URI responseUri = URI.create(verificationProperties.baseUrl() +
-                    verificationProperties.verificationResultEndpoint()
-                            .replace("{client_application_id}", verificationProperties.clientApplicationId())
-                            .replace("{verifier_transaction_id}", response.verifierTransactionId()));
-
-            return new VerificationTransactionData(response, statusUri, responseUri);
-
-        } catch (ResourceAccessException e) {
-            throw new VerifierServiceIOException("IO error when calling Verifier service to start verification", e);
-        } catch (RestClientException e) {
-            throw new VerifierServiceException("Configuration error against Verifier-service? path=" + verificationProperties.verificationStartEndpoint(), e);
+        if (response == null) {
+            throw new VerifierServiceException("Verifier service returned null response when starting verification");
         }
-   }
+
+        URI statusUri = URI.create(verificationProperties.baseUrl() +
+                verificationProperties.verificationStatusEndpoint()
+                        .replace("{client_application_id}", verificationProperties.clientApplicationId())
+                        .replace("{verifier_transaction_id}", response.verifierTransactionId()));
+        URI responseUri = URI.create(verificationProperties.baseUrl() +
+                verificationProperties.verificationResultEndpoint()
+                        .replace("{client_application_id}", verificationProperties.clientApplicationId())
+                        .replace("{verifier_transaction_id}", response.verifierTransactionId()));
+
+        return new VerificationTransactionData(response, statusUri, responseUri);
+
+    }
 
     @Override
     public VerificationResult retrieveVerificationResult(String transactionId) {
@@ -70,5 +61,27 @@ public class VerifierServiceImpl implements VerifierService {
         } catch (RestClientException e) {
             throw new VerifierServiceException("Configuration error against Verifier-service? path=" + verificationProperties.verificationResultEndpoint(), e);
         }
+    }
+
+
+    private @Nullable VerificationStartResponse getVerificationStartResponse(String dcql) {
+        VerificationStartResponse response;
+        try {
+            response = restClient
+                    .post()
+                    .uri(verificationProperties.verificationStartEndpoint(), verificationProperties.clientApplicationId())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(dcql)
+                    .retrieve()
+                    .body(VerificationStartResponse.class);
+
+
+        } catch (ResourceAccessException e) {
+            throw new VerifierServiceIOException("IO error when calling Verifier service to start verification", e);
+        } catch (RestClientException e) {
+            throw new VerifierServiceException("Configuration error against Verifier-service? path=" + verificationProperties.verificationStartEndpoint(), e);
+        }
+        return response;
     }
 }

@@ -4,6 +4,7 @@ import no.idporten.eudiw.bevisgenerator.integration.issuerserver.IssuerServerSer
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.CredentialConfiguration;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerServerProperties;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationResult;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +17,15 @@ import org.springframework.web.servlet.view.RedirectView;
 import tools.jackson.databind.ObjectMapper;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class VerificationControllerTest {
 
     private MockMvc mockMvc;
+    private VerifierService verifierService;
     private CredentialConfiguration issuanceConfig;
     private CredentialConfiguration subjectConfig;
 
@@ -37,8 +42,8 @@ class VerificationControllerTest {
     void setUp() {
         IssuerServerService issuerServerService = mock(IssuerServerService.class);
         IssuerServerProperties issuerServerProperties = mock(IssuerServerProperties.class);
-        VerifierService verifierService = mock(VerifierService.class);
-        ObjectMapper objectMapper = mock(ObjectMapper.class);
+        verifierService = mock(VerifierService.class);
+        ObjectMapper objectMapper = new ObjectMapper();
 
         issuanceConfig = new CredentialConfiguration(
                 "http://issuer",
@@ -66,6 +71,15 @@ class VerificationControllerTest {
                         URI.create("http://verifier/status/tx-id"),
                         URI.create("http://verifier/result/tx-id")
                 ));
+        when(verifierService.retrieveVerificationResult("tx-id")).thenReturn(new VerificationResult(
+                "tx-id",
+                Map.of(
+                        "proof_of_age",
+                        List.of(new VerificationResult.CredentialPresentation(
+                                Map.of("age_over_18", true)
+                        ))
+                )
+        ));
 
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
@@ -109,7 +123,27 @@ class VerificationControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/verification-presentation"))
                 .andExpect(flash().attributeExists("qrCode"))
-                .andExpect(flash().attributeExists("authorizationRequest"));
+                .andExpect(flash().attributeExists("authorizationRequest"))
+                .andExpect(flash().attribute("transactionId", "tx-id"));
+    }
+
+    @Test
+    void getVerificationPresentationReturnsPresentationView() throws Exception {
+        mockMvc.perform(get("/verification-presentation"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("verification-presentation"));
+    }
+
+    @Test
+    void getVerificationResultAddsResultAndPrettyJsonToModel() throws Exception {
+        mockMvc.perform(get("/verification-result").param("transactionId", "tx-id"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("verification-result"))
+                .andExpect(model().attributeExists("result"))
+                .andExpect(model().attribute("resultJson", containsString("\"proof_of_age\"")))
+                .andExpect(model().attribute("resultJson", containsString("\"age_over_18\" : true")));
+
+        verify(verifierService).retrieveVerificationResult("tx-id");
     }
 
     @Test

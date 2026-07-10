@@ -6,18 +6,15 @@ import org.springframework.web.client.RestClientException;
 
 public class VerifierServiceException extends RuntimeException {
 
-    private final RestClientException restClientResponseException;
+    public VerifierServiceException(String message) {
+        super(message);
+    }
 
      public VerifierServiceException(String message, RestClientException cause) {
         super(message, cause);
-        restClientResponseException = cause;
     }
 
     public HttpStatusCode getHttpStatusCode() {
-        return HttpStatus.SERVICE_UNAVAILABLE;
-    }
-
-    public String getCauseMessage(){
-        return restClientResponseException.getMessage();
+        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 }
