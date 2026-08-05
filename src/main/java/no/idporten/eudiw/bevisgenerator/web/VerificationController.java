@@ -49,6 +49,7 @@ public class VerificationController {
 
     @GetMapping("/verification-start")
     public ModelAndView verify() {
+        var a = issuerServerService.getAllCredentialIssuerMetadata();
         return baseView(new StartVerificationForm());
     }
 

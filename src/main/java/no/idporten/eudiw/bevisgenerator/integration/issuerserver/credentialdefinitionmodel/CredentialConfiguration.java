@@ -21,7 +21,7 @@ public record CredentialConfiguration(
         List<String> cryptographicBindingMethodsSupported,
 
         @JsonProperty("credential_signing_alg_values_supported")
-        List<Integer> credentialSigningAlgValuesSupported,
+        List<String> credentialSigningAlgValuesSupported,
 
         @JsonProperty("credential_metadata")
         CredentialConfigurationMetadata credentialMetadata,

@@ -10,11 +10,10 @@ import java.util.Objects;
 @ConfigurationProperties(prefix = "bevisgenerator.issuer-server")
 public record IssuerServerProperties (
         String credentialIssuer,
-        String credentialIssuerPid,
-        String credentialIssuerMinId,
         String issuanceEndpoint,
         List<CredentialConfiguration> credentialConfigurations,
-        List<CredentialConfiguration> subjectCredentialConfigurations) {
+        List<CredentialConfiguration> subjectCredentialConfigurations,
+        List<String> wellKnownUrls) {
 
     public String getIssuanceEndpoint() {
         return issuanceEndpoint();
