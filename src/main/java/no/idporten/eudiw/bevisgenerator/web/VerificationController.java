@@ -5,7 +5,6 @@ import net.minidev.json.JSONObject;
 import no.idporten.eudiw.bevisgenerator.exception.IssuerUiException;
 import no.idporten.eudiw.bevisgenerator.integration.byobservice.model.Display;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.IssuerServerService;
-import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.CredentialConfiguration;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.config.IssuerServerProperties;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.ClaimMetadata;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.CredentialIssuerMetadata;
@@ -27,6 +26,9 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class VerificationController {
@@ -55,8 +57,6 @@ public class VerificationController {
 
     @GetMapping("/verification-start")
     public ModelAndView verify() {
-        List<CredentialIssuerMetadata> credentialIssuerMetadata = issuerServerService.getAllCredentialIssuerMetadata();
-        createViewModelForCredentialIssuerMetadata(credentialIssuerMetadata);
         return baseView(new StartVerificationForm());
     }
 
@@ -66,21 +66,32 @@ public class VerificationController {
 
             for (String key : metadata.credentialConfigurationsSupported().keySet()) {
                 no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.CredentialConfiguration config = metadata.credentialConfigurationsSupported().get(key);
-                Display display = config.credentialMetadata().display().stream().findFirst().orElse(null);
-                List<ClaimMetadata> claimMetadata = config.credentialMetadata().claims();
+                var credentialMetadata = config.credentialMetadata();
+                Display display = credentialMetadata != null && credentialMetadata.display() != null
+                        ? credentialMetadata.display().stream().findFirst().orElse(null)
+                        : null;
+                List<ClaimMetadata> claimMetadata = credentialMetadata != null && credentialMetadata.claims() != null
+                        ? credentialMetadata.claims()
+                        : List.of();
 
                 List<SelectableClaim> claims = new ArrayList<>();
                 for (ClaimMetadata claim : claimMetadata) {
                     claims.add(new SelectableClaim(
-                            claim.display().stream().findFirst().map(Display::name).orElse("No display name found"),
-                            String.join(".", claim.path()))
+                            claim.display() != null
+                                    ? claim.display().stream().findFirst().map(Display::name).orElse("No display name found")
+                                    : "No display name found",
+                            claim.path() != null ? claim.path() : List.of())
                     );
                 }
-                JSONObject meta = "dc+sd-jwt".equals(config.format())
-                        ? new JSONObject().appendField("vct_values", List.of(config.vct()))
-                        : new JSONObject().appendField("doctype_value", config.doctype());
+                JSONObject meta = new JSONObject();
+                if ("dc+sd-jwt".equals(config.format()) && config.vct() != null) {
+                    meta.appendField("vct_values", List.of(config.vct()));
+                } else if (config.doctype() != null) {
+                    meta.appendField("doctype_value", config.doctype());
+                }
 
                 displayDataList.add(new CredentialDefinitionDisplayData(
+                        key,
                         display != null ? display.name() : "No display name found",
                         metadata.credentialIssuer(),
                         config.format(),
@@ -92,45 +103,34 @@ public class VerificationController {
         return displayDataList;
     }
 
-//    @SneakyThrows
-//    public JSONObject makeDCQLQuery(CredentialConfiguration credentialConfiguration, String id) {
-//        JSONObject credential = new JSONObject()
-//                .appendField("id", id)
-//                .appendField("format", credentialConfiguration.getFormat())
-//                .appendField("meta",
-//                        "dc+sd-jwt".equals(credentialConfiguration.getFormat())
-//                                ?
-//                                new JSONObject().appendField("vct_values", List.of(credentialConfiguration.getVct()))
-//                                :
-//                                new JSONObject().appendField("doctype_value", credentialConfiguration.getDoctype()))
-//                .appendField("claims",
-//                        credentialConfiguration.getCredentialMetadata().getClaimsDescriptions().stream()
-//                                .map(cd -> new JSONObject().appendField("path", calculatePath(credentialConfiguration.getFormat(), cd)))
-//                                .toList());
-//        return new JSONObject().appendField("credentials", new JSONArray().appendElement(credential));
-//    }
-//
-//    protected List<String> calculatePath(String credentialFormat, ClaimsDescription claimsDescription) {
-//        if ("dc+sd-jwt".equals(credentialFormat)) {
-//            return claimsDescription.getPath();
-//        }
-//        // do not ask for map or list elements in mdoc credentials
-//        if (claimsDescription.getPath().size() == 2) {
-//            return claimsDescription.getPath();
-//        }
-//        return claimsDescription.getPath().subList(0, 2);
-//    }
-
     @PostMapping("/verification-start")
     public ModelAndView startVerification(@Valid @ModelAttribute("verificationForm") StartVerificationForm form,
                                           BindingResult bindingResult,
                                           RedirectAttributes redirectAttributes) {
+        List<CredentialDefinitionDisplayData> credentialDefinitions = createViewModelForCredentialIssuerMetadata(
+                issuerServerService.getAllCredentialIssuerMetadata()
+        );
 
         if (bindingResult.hasErrors()) {
-            return baseView(form);
+            return baseView(form, credentialDefinitions);
         }
 
-        VerificationTransactionData verificationTransactionData = verifierService.startVerification(form.dcql());
+        CredentialDefinitionDisplayData credentialDefinition = credentialDefinitions.stream()
+                .filter(definition -> definition.id().equals(form.credentialConfigurationId()))
+                .findFirst()
+                .orElse(null);
+
+        if (credentialDefinition == null) {
+            bindingResult.rejectValue(
+                    "credentialConfigurationId",
+                    "credentialConfigurationId.invalid",
+                    "Ukjend credential configuration"
+            );
+            return baseView(form, credentialDefinitions);
+        }
+
+        String dcql = buildDcql(credentialDefinition, form.selectedClaimPaths());
+        VerificationTransactionData verificationTransactionData = verifierService.startVerification(dcql);
 
         redirectAttributes.addFlashAttribute("qrCode", verificationTransactionData.verificationStartResponse().authorizationRequestQrCode());
         redirectAttributes.addFlashAttribute("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest());
@@ -158,11 +158,18 @@ public class VerificationController {
     }
 
     private ModelAndView baseView(StartVerificationForm form) {
-        List<CredentialConfiguration> credentialConfigurations = new ArrayList<>(issuerServerService.getAll());
-        credentialConfigurations.addAll(issuerServerService.getAllSubjectCredentialConfigurations());
+        List<CredentialDefinitionDisplayData> credentialDefinitions = createViewModelForCredentialIssuerMetadata(
+                issuerServerService.getAllCredentialIssuerMetadata()
+        );
+        return baseView(form, credentialDefinitions);
+    }
+
+    private ModelAndView baseView(StartVerificationForm form, List<CredentialDefinitionDisplayData> credentialDefinitions) {
         return new ModelAndView("verification-start")
                 .addObject("verificationForm", form)
-                .addObject("credentialConfigurations", credentialConfigurations);
+                .addObject("credentialDefinitions", credentialDefinitions)
+                .addObject("credentialDefinitionsJson", toJsonString(credentialDefinitions))
+                .addObject("selectedClaimPathsJson", toJsonString(form.selectedClaimPaths()));
     }
 
     private String toPrettyJsonString(VerificationResult result) {
@@ -171,5 +178,32 @@ public class VerificationController {
         } catch (JacksonException e) {
             throw new IssuerUiException("Failed to convert verification result to pretty Json string", e);
         }
+    }
+
+    private String toJsonString(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JacksonException e) {
+            throw new IssuerUiException("Failed to convert object to Json string", e);
+        }
+    }
+
+    private String buildDcql(CredentialDefinitionDisplayData definition, List<String> selectedClaimPaths) {
+        Set<String> selectedPaths = selectedClaimPaths == null
+                ? Set.of()
+                : selectedClaimPaths.stream().collect(Collectors.toSet());
+        List<Map<String, List<String>>> claims = definition.claims().stream()
+                .filter(claim -> selectedPaths.contains(String.join(".", claim.path())))
+                .map(claim -> Map.of("path", claim.path()))
+                .toList();
+
+        return toJsonString(Map.of(
+                "credentials", List.of(Map.of(
+                        "id", definition.id(),
+                        "format", definition.format(),
+                        "meta", definition.meta(),
+                        "claims", claims
+                ))
+        ));
     }
 }

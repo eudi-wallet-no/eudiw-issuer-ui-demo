@@ -5,6 +5,7 @@ import net.minidev.json.JSONObject;
 import java.util.List;
 
 public record CredentialDefinitionDisplayData(
+        String id,
         String title,
         String issuer,
         String format,
