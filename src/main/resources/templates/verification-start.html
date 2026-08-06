@@ -96,10 +96,10 @@
             .map((claim) => {
                 const pathText = Array.isArray(claim.path) ? claim.path.join(".") : "";
                 const checked = selectedClaimPaths.has(pathText);
-                return `<label style="display:block; margin-bottom: var(--ds-size-2);">
+                return `<label style="display:flex; align-items:center; gap: var(--ds-size-2); margin-bottom: var(--ds-size-2);">
                     <input type="checkbox" name="selectedClaimPaths" value="${escapeHtml(pathText)}"
                            ${checked ? "checked" : ""}>
-                    ${escapeHtml(claim.label)} <span style="opacity:0.8">(${escapeHtml(pathText)})</span>
+                    <span>${escapeHtml(claim.label)} <span style="opacity:0.8">(${escapeHtml(pathText)})</span></span>
                 </label>`;
             })
             .join("");
