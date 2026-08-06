@@ -1,14 +1,13 @@
 package no.idporten.eudiw.bevisgenerator.integration.verifierservice.model;
 
-import net.minidev.json.JSONObject;
-
 import java.util.List;
+import java.util.Map;
 
 public record CredentialDefinitionDisplayData(
         String id,
         String title,
         String issuer,
         String format,
-        JSONObject meta,
+        Map<String, Object> meta,
         List<SelectableClaim> claims
 ) { }

@@ -24,10 +24,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
@@ -83,15 +81,18 @@ public class VerificationController {
                             claim.path() != null ? claim.path() : List.of())
                     );
                 }
-                JSONObject meta = new JSONObject();
+
+                Map<String, Object> meta = new HashMap<>();
                 if ("dc+sd-jwt".equals(config.format()) && config.vct() != null) {
-                    meta.appendField("vct_values", List.of(config.vct()));
+                    meta.put("vct_values", List.of(config.vct()));
                 } else if (config.doctype() != null) {
-                    meta.appendField("doctype_value", config.doctype());
+                    meta.put("doctype_value", config.doctype());
                 }
 
+                String id = normalizeDcqlId(key, displayDataList.size() + 1);
+
                 displayDataList.add(new CredentialDefinitionDisplayData(
-                        key,
+                        id,
                         display != null ? display.name() : "No display name found",
                         metadata.credentialIssuer(),
                         config.format(),
@@ -101,6 +102,18 @@ public class VerificationController {
             }
         }
         return displayDataList;
+    }
+
+    private static final Pattern NON_ALLOWED = Pattern.compile("[^A-Za-z0-9_-]+");
+
+    static String normalizeDcqlId(String key, int indexFallback) {
+        String base = key == null ? "" : NON_ALLOWED.matcher(key).replaceAll("-");
+        base = base.replaceAll("^-+|-+$", "");   // trim leading/trailing '-'
+        base = base.replaceAll("-{2,}", "-");    // collapse repeated '-'
+        if (base.isBlank()) {
+            base = "cred-" + indexFallback;      // guaranteed non-empty fallback
+        }
+        return base;
     }
 
     @PostMapping("/verification-start")
