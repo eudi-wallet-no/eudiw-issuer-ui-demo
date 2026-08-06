@@ -1,0 +1,111 @@
+package no.idporten.eudiw.bevisgenerator.integration.verifierservice;
+
+import no.idporten.eudiw.bevisgenerator.exception.IssuerUiException;
+import no.idporten.eudiw.bevisgenerator.integration.byobservice.model.Display;
+import no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.ClaimMetadata;
+import no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.CredentialIssuerMetadata;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.CredentialDefinitionDisplayData;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.SelectableClaim;
+import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+
+import java.util.*;
+import java.util.regex.Pattern;
+
+@Service
+public class DCQLServiceImpl implements DCQLService {
+
+    private static final Pattern NON_ALLOWED = Pattern.compile("[^A-Za-z0-9_-]+");
+
+    private final ObjectMapper objectMapper;
+
+    public DCQLServiceImpl(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public List<CredentialDefinitionDisplayData> createViewModelForCredentialIssuerMetadata(List<CredentialIssuerMetadata> credentialIssuerMetadata) {
+        List<CredentialDefinitionDisplayData> displayDataList = new ArrayList<>();
+        for (CredentialIssuerMetadata metadata : credentialIssuerMetadata) {
+
+            for (String key : metadata.credentialConfigurationsSupported().keySet()) {
+                no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.CredentialConfiguration config = metadata.credentialConfigurationsSupported().get(key);
+                var credentialMetadata = config.credentialMetadata();
+                Display display = credentialMetadata != null && credentialMetadata.display() != null
+                        ? credentialMetadata.display().stream().findFirst().orElse(null)
+                        : null;
+                List<ClaimMetadata> claimMetadata = credentialMetadata != null && credentialMetadata.claims() != null
+                        ? credentialMetadata.claims()
+                        : List.of();
+
+                List<SelectableClaim> claims = new ArrayList<>();
+                for (ClaimMetadata claim : claimMetadata) {
+                    claims.add(new SelectableClaim(
+                            claim.display() != null
+                                    ? claim.display().stream().findFirst().map(Display::name).orElse("No display name found")
+                                    : "No display name found",
+                            claim.path() != null ? claim.path() : List.of())
+                    );
+                }
+
+                Map<String, Object> meta = new HashMap<>();
+                if ("dc+sd-jwt".equals(config.format()) && config.vct() != null) {
+                    meta.put("vct_values", List.of(config.vct()));
+                } else if (config.doctype() != null) {
+                    meta.put("doctype_value", config.doctype());
+                }
+
+                String id = normalizeDcqlId(key, displayDataList.size() + 1);
+
+                displayDataList.add(new CredentialDefinitionDisplayData(
+                        id,
+                        display != null ? display.name() : "No display name found",
+                        metadata.credentialIssuer(),
+                        config.format(),
+                        meta,
+                        claims
+                ));
+            }
+        }
+        return displayDataList;
+    }
+
+    @Override
+    public String buildDcql(CredentialDefinitionDisplayData definition, List<String> selectedClaimPaths) {
+        Set<String> selectedPaths = selectedClaimPaths == null
+                ? Set.of()
+                : new HashSet<>(selectedClaimPaths);
+        List<Map<String, List<String>>> claims = definition.claims().stream()
+                .filter(claim -> selectedPaths.contains(String.join(".", claim.path())))
+                .map(claim -> Map.of("path", claim.path()))
+                .toList();
+
+        return toJsonString(Map.of(
+                "credentials", List.of(Map.of(
+                        "id", definition.id(),
+                        "format", definition.format(),
+                        "meta", definition.meta(),
+                        "claims", claims
+                ))
+        ));
+    }
+
+    static String normalizeDcqlId(String key, int indexFallback) {
+        String base = key == null ? "" : NON_ALLOWED.matcher(key).replaceAll("-");
+        base = base.replaceAll("^-+|-+$", "");   // trim leading/trailing '-'
+        base = base.replaceAll("-{2,}", "-");    // collapse repeated '-'
+        if (base.isBlank()) {
+            base = "cred-" + indexFallback;      // guaranteed non-empty fallback
+        }
+        return base;
+    }
+
+    private String toJsonString(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JacksonException e) {
+            throw new IssuerUiException("Failed to convert object to Json string", e);
+        }
+    }
+}
