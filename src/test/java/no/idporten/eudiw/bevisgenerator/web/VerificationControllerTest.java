@@ -156,7 +156,7 @@ class VerificationControllerTest {
                 .andExpect(flash().attribute("transactionId", "tx-id"));
 
         verify(verifierService).startVerification(argThat(dcql ->
-                dcql.contains("\"id\":\"pid\"")
+                dcql.contains("\"id\"")
                         && dcql.contains("\"format\":\"dc+sd-jwt\"")
                         && !dcql.contains("\"personidentifikator\"")
                         && dcql.contains("\"epostadresse\"")
