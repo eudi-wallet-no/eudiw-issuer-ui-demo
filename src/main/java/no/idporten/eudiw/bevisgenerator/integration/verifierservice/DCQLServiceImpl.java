@@ -4,6 +4,7 @@ import no.idporten.eudiw.bevisgenerator.exception.IssuerUiException;
 import no.idporten.eudiw.bevisgenerator.integration.byobservice.model.Display;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.ClaimMetadata;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.CredentialConfiguration;
+import no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.CredentialConfigurationMetadata;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.credentialdefinitionmodel.CredentialIssuerMetadata;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.CredentialDefinitionDisplayData;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.SelectableClaim;
@@ -28,13 +29,14 @@ public class DCQLServiceImpl implements DCQLService {
 
 
     @Override
-    public List<CredentialDefinitionDisplayData> createViewModelForCredentialIssuerMetadata(List<CredentialIssuerMetadata> credentialIssuerMetadata) {
+    public List<CredentialDefinitionDisplayData> createCredentialDefinitionDisplayData(List<CredentialIssuerMetadata> credentialIssuerMetadata) {
         List<CredentialDefinitionDisplayData> displayDataList = new ArrayList<>();
         for (CredentialIssuerMetadata metadata : credentialIssuerMetadata) {
 
             for (String key : metadata.credentialConfigurationsSupported().keySet()) {
                 CredentialConfiguration config = metadata.credentialConfigurationsSupported().get(key);
-                var credentialMetadata = config.credentialMetadata();
+                CredentialConfigurationMetadata credentialMetadata = config.credentialMetadata();
+
                 Display display = credentialMetadata != null && credentialMetadata.display() != null
                         ? credentialMetadata.display().stream().findFirst().orElse(null)
                         : null;

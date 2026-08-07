@@ -41,7 +41,6 @@ class VerificationControllerTest {
 
     private MockMvc mockMvc;
     private VerifierService verifierService;
-    private DCQLService dcqlService;
     private String issuanceDefinitionId;
 
     @BeforeEach
@@ -50,7 +49,7 @@ class VerificationControllerTest {
         IssuerServerProperties issuerServerProperties = mock(IssuerServerProperties.class);
         verifierService = mock(VerifierService.class);
         ObjectMapper objectMapper = new ObjectMapper();
-        dcqlService = new DCQLServiceImpl(objectMapper);
+        DCQLService dcqlService = new DCQLServiceImpl(objectMapper);
 
         issuanceDefinitionId = "pid";
         String subjectDefinitionId = "proof_of_age";

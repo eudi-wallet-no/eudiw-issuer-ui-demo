@@ -58,7 +58,7 @@ public class VerificationController {
     public ModelAndView startVerification(@Valid @ModelAttribute("verificationForm") StartVerificationForm form,
                                           BindingResult bindingResult,
                                           RedirectAttributes redirectAttributes) {
-        List<CredentialDefinitionDisplayData> credentialDefinitions = dcqlService.createViewModelForCredentialIssuerMetadata(
+        List<CredentialDefinitionDisplayData> credentialDefinitions = dcqlService.createCredentialDefinitionDisplayData(
                 issuerServerService.getAllCredentialIssuerMetadata()
         );
 
@@ -77,6 +77,7 @@ public class VerificationController {
                     "credentialConfigurationId.invalid",
                     "Ukjend credential configuration"
             );
+
             return baseView(form, credentialDefinitions);
         }
 
@@ -109,7 +110,7 @@ public class VerificationController {
     }
 
     private ModelAndView baseView(StartVerificationForm form) {
-        List<CredentialDefinitionDisplayData> credentialDefinitions = dcqlService.createViewModelForCredentialIssuerMetadata(
+        List<CredentialDefinitionDisplayData> credentialDefinitions = dcqlService.createCredentialDefinitionDisplayData(
                 issuerServerService.getAllCredentialIssuerMetadata()
         );
         return baseView(form, credentialDefinitions);

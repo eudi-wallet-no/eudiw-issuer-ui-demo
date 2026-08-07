@@ -6,6 +6,6 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.Creden
 import java.util.List;
 
 public interface DCQLService {
-    List<CredentialDefinitionDisplayData> createViewModelForCredentialIssuerMetadata(List<CredentialIssuerMetadata> credentialIssuerMetadata);
+    List<CredentialDefinitionDisplayData> createCredentialDefinitionDisplayData(List<CredentialIssuerMetadata> credentialIssuerMetadata);
     String buildDcql(CredentialDefinitionDisplayData definition, List<String> selectedClaimPaths);
 }
