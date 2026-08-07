@@ -48,7 +48,7 @@ public class DCQLServiceImpl implements DCQLService {
 
                 Map<String, Object> meta = formatCredentialConfigurationMetadata(config);
 
-                String id = normalizeDcqlId(key, displayDataList.size() + 1);
+                String id = normalizeDcqlId(key);
 
                 displayDataList.add(new CredentialDefinitionDisplayData(
                         id,
@@ -65,13 +65,7 @@ public class DCQLServiceImpl implements DCQLService {
 
     @Override
     public String buildDcql(CredentialDefinitionDisplayData credentialDefinitionDisplayData, List<String> selectedClaimPaths) {
-        Set<String> selectedPaths = selectedClaimPaths == null
-                ? Set.of()
-                : new HashSet<>(selectedClaimPaths);
-        List<Map<String, List<String>>> claims = credentialDefinitionDisplayData.claims().stream()
-                .filter(claim -> selectedPaths.contains(String.join(".", claim.path())))
-                .map(claim -> Map.of("path", claim.path()))
-                .toList();
+        List<Map<String, List<String>>> claims = getClaimsWithFullPath(credentialDefinitionDisplayData, selectedClaimPaths);
 
         return toJsonString(Map.of(
                 "credentials", List.of(Map.of(
@@ -83,14 +77,21 @@ public class DCQLServiceImpl implements DCQLService {
         ));
     }
 
-    static String normalizeDcqlId(String key, int indexFallback) {
+    private static @NonNull List<Map<String, List<String>>> getClaimsWithFullPath(CredentialDefinitionDisplayData credentialDefinitionDisplayData, List<String> selectedClaimPaths) {
+        Set<String> selectedPaths = selectedClaimPaths == null
+                ? Set.of()
+                : new HashSet<>(selectedClaimPaths);
+        return credentialDefinitionDisplayData.claims().stream()
+                .filter(claim -> selectedPaths.contains(String.join(".", claim.path())))
+                .map(claim -> Map.of("path", claim.path()))
+                .toList();
+    }
+
+    static String normalizeDcqlId(String key) {
         String base = key == null ? "" : NON_ALLOWED.matcher(key).replaceAll("-");
+        base = base + "-" + UUID.randomUUID();
         base = base.replaceAll("^-+|-+$", "");   // trim leading/trailing '-'
-        base = base.replaceAll("-{2,}", "-");    // collapse repeated '-'
-        if (base.isBlank()) {
-            base = "cred-" + indexFallback;      // guaranteed non-empty fallback
-        }
-        return base;
+        return base.replaceAll("-{2,}", "-");    // collapse repeated '-'
     }
 
     private static @NonNull List<SelectableClaim> getSelectableClaims(List<ClaimMetadata> claimMetadata) {
