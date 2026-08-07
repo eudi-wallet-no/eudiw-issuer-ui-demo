@@ -31,31 +31,25 @@ public class DCQLServiceImpl implements DCQLService {
     @Override
     public List<CredentialDefinitionDisplayData> createCredentialDefinitionDisplayData(List<CredentialIssuerMetadata> credentialIssuerMetadata) {
         List<CredentialDefinitionDisplayData> displayDataList = new ArrayList<>();
+
+        if (credentialIssuerMetadata == null || credentialIssuerMetadata.isEmpty()) {
+            return displayDataList;
+        }
+
         for (CredentialIssuerMetadata metadata : credentialIssuerMetadata) {
+
+            if (metadata == null) {
+                continue;
+            }
 
             for (String key : metadata.credentialConfigurationsSupported().keySet()) {
                 CredentialConfiguration config = metadata.credentialConfigurationsSupported().get(key);
-                CredentialConfigurationMetadata credentialMetadata = config.credentialMetadata();
 
-                Display display = credentialMetadata != null && credentialMetadata.display() != null
-                        ? credentialMetadata.display().stream().findFirst().orElse(null)
-                        : null;
-                List<ClaimMetadata> claimMetadata = credentialMetadata != null && credentialMetadata.claims() != null
-                        ? credentialMetadata.claims()
-                        : List.of();
+                if (config == null) {
+                    continue;
+                }
 
-                List<SelectableClaim> claims = getSelectableClaims(claimMetadata);
-
-                Map<String, Object> meta = formatCredentialConfigurationMetadata(config);
-
-                displayDataList.add(new CredentialDefinitionDisplayData(
-                        key,
-                        display != null ? display.name() : "No display name found",
-                        metadata.credentialIssuer(),
-                        config.format(),
-                        meta,
-                        claims
-                ));
+                displayDataList.add(buildCredentialDefinitionDisplayData(key, config, metadata.credentialIssuer()));
             }
         }
 
@@ -72,6 +66,34 @@ public class DCQLServiceImpl implements DCQLService {
                         "claims", getClaimsWithFullPath(credentialDefinitionDisplayData, selectedClaimPaths)
                 ))
         ));
+    }
+
+    private static CredentialDefinitionDisplayData buildCredentialDefinitionDisplayData(
+            String key,
+            CredentialConfiguration config,
+            String issuer
+    ) {
+        CredentialConfigurationMetadata credentialMetadata = config.credentialMetadata();
+
+        Display display = credentialMetadata != null && credentialMetadata.display() != null
+                ? credentialMetadata.display().stream().findFirst().orElse(null)
+                : null;
+        List<ClaimMetadata> claimMetadata = credentialMetadata != null && credentialMetadata.claims() != null
+                ? credentialMetadata.claims()
+                : List.of();
+
+        List<SelectableClaim> claims = getSelectableClaims(claimMetadata);
+
+        Map<String, Object> meta = formatCredentialConfigurationMetadata(config);
+
+        return new CredentialDefinitionDisplayData(
+                key,
+                display != null ? display.name() : "No display name found",
+                issuer,
+                config.format(),
+                meta,
+                claims
+        );
     }
 
     private static @NonNull List<Map<String, List<String>>> getClaimsWithFullPath(CredentialDefinitionDisplayData credentialDefinitionDisplayData, List<String> selectedClaimPaths) {
