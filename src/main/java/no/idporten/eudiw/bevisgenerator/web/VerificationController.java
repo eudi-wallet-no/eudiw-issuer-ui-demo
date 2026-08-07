@@ -126,11 +126,22 @@ public class VerificationController {
 
     private String toJsonString(Object object, boolean pretty) {
         try {
-            return pretty
+            String text = pretty
                     ? objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object)
                     : objectMapper.writeValueAsString(object);
+
+            return sanitizeForHtmlScriptTag(text);
         } catch (JacksonException e) {
             throw new IssuerUiException("Failed to convert object to Json string", e);
         }
+    }
+
+    private String sanitizeForHtmlScriptTag(String json) {
+        return json
+                .replace("&", "\\u0026")
+                .replace("<", "\\u003c")
+                .replace(">", "\\u003e")
+                .replace("\u2028", "\\u2028")
+                .replace("\u2029", "\\u2029");
     }
 }
