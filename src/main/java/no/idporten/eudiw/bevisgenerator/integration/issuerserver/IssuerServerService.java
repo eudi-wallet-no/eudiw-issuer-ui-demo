@@ -53,6 +53,10 @@ public class IssuerServerService {
         List<String> wellKnownUrls = issuerServerProperties.wellKnownUrls();
         List<CredentialIssuerMetadata> credentialIssuerMetadata = new ArrayList<>();
         for (String wellKnownUrl : wellKnownUrls) {
+            if (wellKnownUrl == null || wellKnownUrl.isBlank()) {
+                continue;
+            }
+
             try {
                 CredentialIssuerMetadata metadata = restClient.get()
                         .uri(wellKnownUrl)
