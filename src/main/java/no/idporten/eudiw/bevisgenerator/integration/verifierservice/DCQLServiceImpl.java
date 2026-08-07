@@ -48,10 +48,8 @@ public class DCQLServiceImpl implements DCQLService {
 
                 Map<String, Object> meta = formatCredentialConfigurationMetadata(config);
 
-                String id = normalizeDcqlId(key);
-
                 displayDataList.add(new CredentialDefinitionDisplayData(
-                        id,
+                        key,
                         display != null ? display.name() : "No display name found",
                         metadata.credentialIssuer(),
                         config.format(),
@@ -60,19 +58,18 @@ public class DCQLServiceImpl implements DCQLService {
                 ));
             }
         }
+
         return displayDataList;
     }
 
     @Override
     public String buildDcql(CredentialDefinitionDisplayData credentialDefinitionDisplayData, List<String> selectedClaimPaths) {
-        List<Map<String, List<String>>> claims = getClaimsWithFullPath(credentialDefinitionDisplayData, selectedClaimPaths);
-
         return toJsonString(Map.of(
                 "credentials", List.of(Map.of(
-                        "id", credentialDefinitionDisplayData.id(),
+                        "id", normalizeDcqlId(credentialDefinitionDisplayData.id()),
                         "format", credentialDefinitionDisplayData.format(),
                         "meta", credentialDefinitionDisplayData.meta(),
-                        "claims", claims
+                        "claims", getClaimsWithFullPath(credentialDefinitionDisplayData, selectedClaimPaths)
                 ))
         ));
     }
