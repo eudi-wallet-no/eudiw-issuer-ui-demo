@@ -2,10 +2,12 @@ package no.idporten.eudiw.bevisgenerator.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 
 // This class does not include config for issuer-server integration, only other configuration.
 @Configuration
+@EnableCaching
 @ConfigurationProperties(ignoreInvalidFields = true, prefix = "bevisgenerator")
 public class BevisgeneratorProperties {
 
