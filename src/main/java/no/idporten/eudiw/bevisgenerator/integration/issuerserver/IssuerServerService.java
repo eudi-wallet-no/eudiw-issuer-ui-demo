@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@EnableCaching
 public class IssuerServerService {
 
     private final static Logger log = LoggerFactory.getLogger(IssuerServerService.class);
@@ -49,6 +52,7 @@ public class IssuerServerService {
         this.credentialIssuerService = credentialIssuerService;
     }
 
+    @Cacheable(value = "all-credential-definitions")
     public List<CredentialIssuerMetadata> getAllCredentialIssuerMetadata() {
         List<String> wellKnownUrls = issuerServerProperties.wellKnownUrls();
         List<CredentialIssuerMetadata> credentialIssuerMetadata = new ArrayList<>();
