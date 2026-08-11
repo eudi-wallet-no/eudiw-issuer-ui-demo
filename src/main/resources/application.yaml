@@ -12,12 +12,9 @@ spring:
     name: digital-lommebok-bevisgenerator
     environment: default
   cache:
-    cache-names:
-      - all-credential-configurations
+    cache-names: credential-issuer-metadata
     caffeine:
-      spec:
-        - maximumSize=1000
-        - expireAfterWrite=2m
+      spec: maximumSize=1000,expireAfterWrite=2m
 
 
 # Spring Boot Actuator
