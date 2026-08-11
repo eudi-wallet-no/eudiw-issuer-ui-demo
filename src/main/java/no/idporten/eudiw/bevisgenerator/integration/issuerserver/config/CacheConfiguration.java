@@ -1,20 +1,24 @@
 package no.idporten.eudiw.bevisgenerator.integration.issuerserver.config;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCache;
-import org.springframework.cache.support.SimpleCacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 @Configuration
+@EnableCaching
 public class CacheConfiguration {
 
     @Bean
     public CacheManager cacheManager() {
-        SimpleCacheManager simpleCacheManager = new SimpleCacheManager();
-        simpleCacheManager.setCaches(List.of(new ConcurrentMapCache("all-credential-definitions")));
-        return simpleCacheManager;
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+        cacheManager.setCaffeine(Caffeine.newBuilder()
+                .maximumSize(100)
+                .expireAfterWrite(2, MINUTES));
+        return cacheManager;
     }
 }

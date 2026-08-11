@@ -21,6 +21,7 @@
         <surefire.plugin.version>3.5.3</surefire.plugin.version>
         <idporten.maskinporten.client.version>6.0.1</idporten.maskinporten.client.version>
         <zxing.javase.version>3.5.4</zxing.javase.version>
+        <caffeine.version>3.2.4</caffeine.version>
     </properties>
     <dependencies>
         <dependency>
@@ -34,6 +35,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -68,6 +73,11 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
             <version>${zxing.javase.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${caffeine.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
