@@ -16,7 +16,7 @@ spring:
       - all-credential-configurations
     caffeine:
       spec:
-        - maximumSize=100
+        - maximumSize=1000
         - expireAfterWrite=2m
 
 
