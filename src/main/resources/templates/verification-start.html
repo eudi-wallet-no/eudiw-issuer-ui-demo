@@ -66,6 +66,7 @@
     const selectedClaimPaths = new Set(JSON.parse(document.getElementById("selected-claims-data").textContent || "[]"));
     const configurationSelect = document.getElementById("credentialConfigurationId");
     const claimsContainer = document.getElementById("claims-container");
+    let oldDefinitionId = "";
 
     function escapeHtml(value) {
         return String(value)
@@ -81,15 +82,36 @@
         return definitions.find(definition => definition.id === selectedId);
     }
 
+    function selectAllClaims() {
+        const selectedDefinition = getSelectedDefinition();
+        if (!selectedDefinition || !selectedDefinition.claims) {
+            return;
+        }
+
+        selectedClaimPaths.clear();
+        
+        selectedDefinition.claims.forEach((claim) => {
+            const pathText = Array.isArray(claim.path) ? claim.path.join(".") : "";
+            selectedClaimPaths.add(pathText);
+        });
+    }
+
     function renderClaims() {
         const selectedDefinition = getSelectedDefinition();
+
         if (!selectedDefinition) {
             claimsContainer.innerHTML = "Vel credential configuration for å sjå claims.";
             return;
         }
+
         if (!selectedDefinition.claims || selectedDefinition.claims.length === 0) {
             claimsContainer.innerHTML = "Ingen claims funne i credential definition.";
             return;
+        }
+
+        if (selectedDefinition.id !== oldDefinitionId) {
+            selectAllClaims();
+            oldDefinitionId = selectedDefinition.id;
         }
 
         claimsContainer.innerHTML = selectedDefinition.claims
