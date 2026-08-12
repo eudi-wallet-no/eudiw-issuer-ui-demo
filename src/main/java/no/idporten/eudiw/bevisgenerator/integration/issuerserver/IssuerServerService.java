@@ -50,7 +50,7 @@ public class IssuerServerService {
         this.credentialIssuerService = credentialIssuerService;
     }
 
-    @Cacheable(value = "credential-issuer-metadata", sync = true)
+    @Cacheable(value = "credential-issuer-metadata", sync = true, unless = "#result == null || #result.isEmpty()")
     public List<CredentialIssuerMetadata> getAllCredentialIssuerMetadata() {
         List<String> wellKnownUrls = issuerServerProperties.wellKnownUrls();
         List<CredentialIssuerMetadata> credentialIssuerMetadata = new ArrayList<>();
