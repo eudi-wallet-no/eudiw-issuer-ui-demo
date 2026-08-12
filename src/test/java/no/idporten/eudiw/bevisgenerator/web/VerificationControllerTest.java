@@ -161,7 +161,9 @@ class VerificationControllerTest {
                 .andExpect(flash().attribute("transactionId", "tx-id"))
                 .andExpect(flash().attribute("requestBody", """
                         {
-                          "dcql_query": {"credentials":[]}
+                          "dcql_query" : {
+                            "credentials" : [ ]
+                          }
                         }"""));
 
         verify(verifierService).startVerification(argThat(dcql ->
