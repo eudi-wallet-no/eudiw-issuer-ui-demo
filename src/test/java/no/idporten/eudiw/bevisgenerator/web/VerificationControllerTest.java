@@ -10,6 +10,7 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.DCQLService;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.DCQLServiceImpl;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationResult;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStatus;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStartResponse;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import no.idporten.eudiw.bevisgenerator.integration.byobservice.model.Display;
@@ -191,6 +192,51 @@ class VerificationControllerTest {
                 .andExpect(model().attribute("resultJson", containsString("\"age_over_18\" : true")));
 
         verify(verifierService).retrieveVerificationResult("tx-id");
+    }
+
+    @Test
+    void getVerificationStatusReturnsOkWhenStatusIsAvailable() throws Exception {
+        when(verifierService.retrieveVerificationStatus("tx-id"))
+                .thenReturn(new VerificationStatus("AVAILABLE", "tx-id"));
+
+        mockMvc.perform(get("/verification-presentation/tx-id/status"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getVerificationStatusReturnsAcceptedWhenStatusIsWait() throws Exception {
+        when(verifierService.retrieveVerificationStatus("tx-id"))
+                .thenReturn(new VerificationStatus("WAIT", "tx-id"));
+
+        mockMvc.perform(get("/verification-presentation/tx-id/status"))
+                .andExpect(status().isAccepted());
+    }
+
+    @Test
+    void getVerificationStatusReturnsNotFoundWhenStatusIsUnknown() throws Exception {
+        when(verifierService.retrieveVerificationStatus("tx-id"))
+                .thenReturn(new VerificationStatus("UNKNOWN", "tx-id"));
+
+        mockMvc.perform(get("/verification-presentation/tx-id/status"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getVerificationStatusReturnsNotFoundWhenStatusIsBlank() throws Exception {
+        when(verifierService.retrieveVerificationStatus("tx-id"))
+                .thenReturn(new VerificationStatus("", "tx-id"));
+
+        mockMvc.perform(get("/verification-presentation/tx-id/status"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getVerificationStatusReturnsServerErrorForUnexpectedStatus() throws Exception {
+        when(verifierService.retrieveVerificationStatus("tx-id"))
+                .thenReturn(new VerificationStatus("SOMETHING_ELSE", "tx-id"));
+
+        mockMvc.perform(get("/verification-presentation/tx-id/status"))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test

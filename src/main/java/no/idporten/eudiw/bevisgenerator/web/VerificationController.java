@@ -11,7 +11,6 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.Verifi
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStatus;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import no.idporten.eudiw.bevisgenerator.web.models.StartVerificationForm;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
