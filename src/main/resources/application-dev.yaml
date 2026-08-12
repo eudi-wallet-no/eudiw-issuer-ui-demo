@@ -13,6 +13,10 @@ spring:
     environment: dev
   thymeleaf:
     cache: false
+  data:
+    redis:
+      port: 9282
+      host: localhost
 
 bevisgenerator:
   byob-service:

@@ -11,7 +11,13 @@ spring:
   application:
     name: digital-lommebok-bevisgenerator
     environment: default
-
+  cache:
+    type: redis
+    cache-names: credential-issuer-metadata
+    redis:
+      time-to-live: 2m
+      key-prefix: bevisgenerator::
+      use-key-prefix: true
 
 # Spring Boot Actuator
 management:
