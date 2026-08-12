@@ -8,12 +8,16 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.DCQLService;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.VerifierService;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.CredentialDefinitionDisplayData;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationResult;
+import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStatus;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import no.idporten.eudiw.bevisgenerator.web.models.StartVerificationForm;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -110,6 +114,28 @@ public class VerificationController {
         return new ModelAndView("verification-result")
                 .addObject("result", result)
                 .addObject("resultJson", toJsonString(result.credentials()));
+    }
+
+    @GetMapping("/verification-presentation/{transactionId}/status")
+    public ResponseEntity<?> verificationStatus(@PathVariable String transactionId) {
+        if (transactionId == null || transactionId.isBlank()) {
+            throw new IssuerUiException("Missing transactionId");
+        }
+
+        VerificationStatus verificationStatus = verifierService.retrieveVerificationStatus(transactionId);
+        String status = verificationStatus.status();
+
+        if (status.isBlank() || status.equals("UNKNOWN")) {
+            return ResponseEntity.notFound().build();
+        }
+        if (status.equals("WAIT")) {
+            return ResponseEntity.accepted().build();
+        }
+        if (status.equals("AVAILABLE")) {
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.internalServerError().build();
     }
 
     private ModelAndView baseView(StartVerificationForm form) {
