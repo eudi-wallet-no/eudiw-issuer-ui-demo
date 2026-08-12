@@ -16,7 +16,7 @@ spring:
     cache-names: credential-issuer-metadata
     redis:
       time-to-live: 2m
-      key-prefix: bevisgenerator::
+      key-prefix: "bevisgenerator::"
       use-key-prefix: true
 
 # Spring Boot Actuator
