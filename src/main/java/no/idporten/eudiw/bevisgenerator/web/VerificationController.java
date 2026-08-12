@@ -88,6 +88,9 @@ public class VerificationController {
         redirectAttributes.addFlashAttribute("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest());
         redirectAttributes.addFlashAttribute("transactionId", verificationTransactionData.verificationStartResponse().verifierTransactionId());
         redirectAttributes.addFlashAttribute("statusUri", verificationTransactionData.statusUri());
+        redirectAttributes.addFlashAttribute("requestBody", verificationTransactionData.requestBody());
+        redirectAttributes.addFlashAttribute("requestUri", verificationTransactionData.requestUri());
+        redirectAttributes.addFlashAttribute("responseBody", toJsonString(verificationTransactionData.verificationStartResponse(), true));
 
         return new ModelAndView("redirect:/verification-presentation");
     }
