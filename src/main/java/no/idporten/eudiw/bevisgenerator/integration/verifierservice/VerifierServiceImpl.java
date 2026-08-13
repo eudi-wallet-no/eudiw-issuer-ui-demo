@@ -127,7 +127,7 @@ public class VerifierServiceImpl implements VerifierService {
         return """
                 {
                   "dcql_query": %s,
-                  "redirect_uri": "http://localhost:9290/verification-presentation-redirect"
+                  "redirect_uri": "http://localhost:9290/verification-presentation"
                 }""".formatted(dcql);
     }
 

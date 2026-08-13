@@ -121,12 +121,6 @@ public class VerificationController {
                 .addObject("resultJson", toJsonString(result.credentials()));
     }
 
-    @GetMapping("/verification-presentation-redirect")
-    public ModelAndView verificationPresentationRedirect(HttpSession session) {
-        String verificationTransactionId = (String) session.getAttribute("verification-transaction-id");
-        return verificationResult(verificationTransactionId);
-    }
-
     @GetMapping("/verification-presentation/{transactionId}/status")
     public ResponseEntity<?> verificationStatus(@PathVariable String transactionId) {
         if (transactionId == null || transactionId.isBlank()) {

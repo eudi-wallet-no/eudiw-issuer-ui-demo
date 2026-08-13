@@ -49,12 +49,14 @@
     const statusEndpoint = /*[[@{/verification-presentation/{transactionId}/status(transactionId=${transactionId})}]]*/ "";
     const resultUrl = /*[[@{/verification-result/{transactionId}(transactionId=${transactionId})}]]*/ "";
 
+    window.addEventListener("visibilitychange", (e) => {console.log(e)})
+
     const handle200 = async () => {
         if (document.visibilityState === "visible") {
             window.location.assign(resultUrl);
         }
         else {
-            const redirect = async (event) => {
+            const redirect = async () => {
                 window.removeEventListener("visibilitychange", redirect);
                 window.location.assign(resultUrl);
             }
@@ -79,11 +81,6 @@
 
                 if (response.status === 200) {
                     await handle200();
-                    return;
-                }
-
-                if (response.status === 202) {
-                    setTimeout(poll, interval);
                     return;
                 }
 
