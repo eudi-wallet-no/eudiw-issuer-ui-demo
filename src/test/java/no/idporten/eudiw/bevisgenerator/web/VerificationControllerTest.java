@@ -174,9 +174,25 @@ class VerificationControllerTest {
 
     @Test
     void getVerificationPresentationReturnsPresentationView() throws Exception {
-        mockMvc.perform(get("/verification-presentation/session-id"))
+        VerificationTransactionData verificationTransactionData = new VerificationTransactionData(
+                new VerificationStartResponse("eudi-openid4vp://example", "data:image/png;base64,abc123", "tx-id"),
+                URI.create("http://verifier/start"),
+                "{\"dcql_query\":{\"credentials\":[]}}",
+                URI.create("http://verifier/status/tx-id"),
+                URI.create("http://verifier/result/tx-id")
+        );
+
+        mockMvc.perform(get("/verification-presentation/uniqueKey")
+                        .sessionAttr("verificationTransactionData", verificationTransactionData))
                 .andExpect(status().isOk())
-                .andExpect(view().name("verification-presentation"));
+                .andExpect(view().name("verification-presentation"))
+                .andExpect(model().attributeExists("qrCode"))
+                .andExpect(model().attributeExists("authorizationRequest"))
+                .andExpect(model().attributeExists("transactionId"))
+                .andExpect(model().attributeExists("statusUri"))
+                .andExpect(model().attributeExists("requestBody"))
+                .andExpect(model().attributeExists("requestUri"))
+                .andExpect(model().attributeExists("responseBody"));
     }
 
     @Test
