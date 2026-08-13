@@ -4,10 +4,8 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.Verifi
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStatus;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 
-import java.net.URI;
-
 public interface VerifierService {
-    VerificationTransactionData startVerification(String dcqlQuery, URI redirectUri);
+    VerificationTransactionData startVerification(String requestBody);
     VerificationResult retrieveVerificationResult(String transactionId);
     VerificationStatus retrieveVerificationStatus(String transactionId);
 }

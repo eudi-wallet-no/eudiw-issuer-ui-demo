@@ -25,9 +25,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-import java.net.URI;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 @Controller
 public class VerificationController {
@@ -92,16 +91,10 @@ public class VerificationController {
             return baseView(form, credentialDefinitions);
         }
 
-
-        String dcql = dcqlService.buildDcql(credentialDefinition, form.selectedClaimPaths());
-
         String sessionId = session.getId();
-        URI redirectUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/verification-presentation/{session-id}")
-                .buildAndExpand(sessionId)
-                .toUri();
+        String requestBody = buildStartVerificationRequestBody(credentialDefinition, form.selectedClaimPaths(), sessionId);
 
-        VerificationTransactionData verificationTransactionData = verifierService.startVerification(dcql, redirectUri);
+        VerificationTransactionData verificationTransactionData = verifierService.startVerification(requestBody);
 
         session.setAttribute("verification-transaction-id", verificationTransactionData.verificationStartResponse().verifierTransactionId());
 
@@ -168,6 +161,20 @@ public class VerificationController {
                 .addObject("credentialDefinitions", credentialDefinitions)
                 .addObject("credentialDefinitionsJson", toJsonString(credentialDefinitions, false))
                 .addObject("selectedClaimPathsJson", toJsonString(form.selectedClaimPaths(), false));
+    }
+
+    private String buildStartVerificationRequestBody(CredentialDefinitionDisplayData credentialDefinition, List<String> selectedClaimPaths, String sessionId) {
+        Map<String, Object> dcql = dcqlService.buildDcqlMap(credentialDefinition, selectedClaimPaths);
+
+        String redirectUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/verification-presentation/{session-id}")
+                .buildAndExpand(sessionId)
+                .toString();
+
+        return toJsonString(Map.of(
+                "dcql_query", dcql,
+                "redirect_uri", redirectUri
+        ), false);
     }
 
     private String toJsonString(Object object) {

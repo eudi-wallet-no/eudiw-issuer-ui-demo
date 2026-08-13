@@ -33,9 +33,8 @@ public class VerifierServiceImpl implements VerifierService {
     }
 
     @Override
-    public VerificationTransactionData startVerification(String dcql, URI redirectUri) {
-        String apiRequest = buildApiRequest(dcql, redirectUri.toString());
-        VerificationStartResponse response = getVerificationStartResponse(apiRequest);
+    public VerificationTransactionData startVerification(String requestBody) {
+        VerificationStartResponse response = getVerificationStartResponse(requestBody);
 
         if (response == null) {
             throw new VerifierServiceException("Verifier service returned null response when starting verification");
@@ -53,7 +52,7 @@ public class VerifierServiceImpl implements VerifierService {
                         .replace("{client_application_id}", verificationProperties.clientApplicationId())
                         .replace("{verifier_transaction_id}", response.verifierTransactionId()));
 
-        return new VerificationTransactionData(response, requestUri, apiRequest, statusUri, responseUri);
+        return new VerificationTransactionData(response, requestUri, requestBody, statusUri, responseUri);
 
     }
 
