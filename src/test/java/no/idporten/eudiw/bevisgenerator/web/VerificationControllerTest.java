@@ -50,7 +50,7 @@ class VerificationControllerTest {
         IssuerServerProperties issuerServerProperties = mock(IssuerServerProperties.class);
         verifierService = mock(VerifierService.class);
         ObjectMapper objectMapper = new ObjectMapper();
-        DCQLService dcqlService = new DCQLServiceImpl(objectMapper);
+        DCQLService dcqlService = new DCQLServiceImpl();
 
         issuanceDefinitionId = "pid";
         String subjectDefinitionId = "proof_of_age";
@@ -156,35 +156,32 @@ class VerificationControllerTest {
                         .param("credentialConfigurationId", issuanceDefinitionId)
                         .param("selectedClaimPaths", "epostadresse"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/verification-presentation"))
+                .andExpect(redirectedUrlPattern("/verification-presentation/*"))
                 .andExpect(flash().attributeExists("qrCode"))
                 .andExpect(flash().attributeExists("authorizationRequest"))
                 .andExpect(flash().attribute("transactionId", "tx-id"))
-                .andExpect(flash().attribute("requestBody", """
-                        {
-                          "dcql_query" : {
-                            "credentials" : [ ]
-                          }
-                        }"""));
+                .andExpect(flash().attributeExists("requestBody"));
 
-        verify(verifierService).startVerification(argThat(dcql ->
-                dcql.contains("\"id\"")
-                        && dcql.contains("\"format\":\"dc+sd-jwt\"")
-                        && !dcql.contains("\"personidentifikator\"")
-                        && dcql.contains("\"epostadresse\"")
+        verify(verifierService).startVerification(argThat(requestBody ->
+                requestBody.contains("\"dcql_query\"")
+                        && requestBody.contains("\"id\"")
+                        && requestBody.contains("\"format\":\"dc+sd-jwt\"")
+                        && requestBody.contains("\"redirect_uri\":\"http://localhost/verification-presentation/")
+                        && !requestBody.contains("\"personidentifikator\"")
+                        && requestBody.contains("\"epostadresse\"")
         ));
     }
 
     @Test
     void getVerificationPresentationReturnsPresentationView() throws Exception {
-        mockMvc.perform(get("/verification-presentation"))
+        mockMvc.perform(get("/verification-presentation/session-id"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("verification-presentation"));
     }
 
     @Test
     void getVerificationResultAddsResultAndPrettyJsonToModel() throws Exception {
-        mockMvc.perform(get("/verification-result").param("transactionId", "tx-id"))
+        mockMvc.perform(get("/verification-result/tx-id"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("verification-result"))
                 .andExpect(model().attributeExists("result"))
