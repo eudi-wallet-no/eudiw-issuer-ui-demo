@@ -12,7 +12,6 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.Verifi
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStatus;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import no.idporten.eudiw.bevisgenerator.web.models.StartVerificationForm;
-import org.springframework.boot.web.server.servlet.Session;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -22,10 +21,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
+import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class VerificationController {
@@ -60,10 +62,13 @@ public class VerificationController {
     }
 
     @PostMapping("/verification-start")
-    public ModelAndView startVerification(@Valid @ModelAttribute("verificationForm") StartVerificationForm form,
-                                          BindingResult bindingResult,
-                                          RedirectAttributes redirectAttributes,
-                                         HttpSession session) {
+    public ModelAndView startVerification(
+            @Valid @ModelAttribute("verificationForm")
+            StartVerificationForm form,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            HttpSession session
+    ) {
         List<CredentialDefinitionDisplayData> credentialDefinitions = dcqlService.createCredentialDefinitionDisplayData(
                 issuerServerService.getAllCredentialIssuerMetadata()
         );
@@ -89,7 +94,14 @@ public class VerificationController {
 
 
         String dcql = dcqlService.buildDcql(credentialDefinition, form.selectedClaimPaths());
-        VerificationTransactionData verificationTransactionData = verifierService.startVerification(dcql);
+
+        String sessionId = session.getId();
+        URI redirectUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/verification-presentation/{session-id}")
+                .buildAndExpand(sessionId)
+                .toUri();
+
+        VerificationTransactionData verificationTransactionData = verifierService.startVerification(dcql, redirectUri);
 
         session.setAttribute("verification-transaction-id", verificationTransactionData.verificationStartResponse().verifierTransactionId());
 
@@ -101,11 +113,11 @@ public class VerificationController {
         redirectAttributes.addFlashAttribute("requestUri", verificationTransactionData.requestUri());
         redirectAttributes.addFlashAttribute("responseBody", toJsonString(verificationTransactionData.verificationStartResponse()));
 
-        return new ModelAndView("redirect:/verification-presentation");
+        return new ModelAndView("redirect:/verification-presentation/" + sessionId);
     }
 
-    @GetMapping("/verification-presentation")
-    public ModelAndView verificationPresentation() {
+    @GetMapping("/verification-presentation/{session-id}")
+    public ModelAndView verificationPresentation(@PathVariable("session-id") String sessionId) {
         return new ModelAndView("verification-presentation");
     }
 

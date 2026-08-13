@@ -33,8 +33,8 @@ public class VerifierServiceImpl implements VerifierService {
     }
 
     @Override
-    public VerificationTransactionData startVerification(String dcql) {
-        String apiRequest = buildApiRequest(dcql);
+    public VerificationTransactionData startVerification(String dcql, URI redirectUri) {
+        String apiRequest = buildApiRequest(dcql, redirectUri.toString());
         VerificationStartResponse response = getVerificationStartResponse(apiRequest);
 
         if (response == null) {
@@ -123,12 +123,13 @@ public class VerifierServiceImpl implements VerifierService {
         }
     }
 
-    private String buildApiRequest(String dcql) {
+    private String buildApiRequest(String dcql, String redirectUri) {
         return """
                 {
                   "dcql_query": %s,
-                  "redirect_uri": "http://localhost:9290/verification-presentation"
-                }""".formatted(dcql);
+                  "redirect_uri": "%s"
+                }""".formatted(dcql, redirectUri);
+
     }
 
     private static ResponseErrorHandler verifierErrorHandler() {
