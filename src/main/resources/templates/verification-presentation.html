@@ -21,9 +21,6 @@
             <a th:href="${authorizationRequest}" class="ds-button" type="button" data-variant="primary" style="min-width:75px">
                 Opne på mobilen
             </a>
-            <a th:href="@{/verification-result(transactionId=${transactionId})}" class="ds-button" type="button" data-variant="primary">
-                Sjå resultat
-            </a>
             <a th:href="@{/verification-start}" class="ds-button" type="button" data-variant="secondary">
                 Tilbake
             </a>
@@ -50,7 +47,20 @@
 <script th:inline="javascript">
     const statusMessage = document.getElementById("verification-status-message");
     const statusEndpoint = /*[[@{/verification-presentation/{transactionId}/status(transactionId=${transactionId})}]]*/ "";
-    const resultUrl = /*[[@{/verification-result(transactionId=${transactionId})}]]*/ "";
+    const resultUrl = /*[[@{/verification-result/{transactionId}(transactionId=${transactionId})}]]*/ "";
+
+    const handle200 = async () => {
+        if (document.visibilityState === "visible") {
+            window.location.assign(resultUrl);
+        }
+        else {
+            const redirect = async (event) => {
+                window.removeEventListener("visibilitychange", redirect);
+                window.location.assign(resultUrl);
+            }
+            window.addEventListener("visibilitychange", redirect);
+        }
+    };
 
     async function waitForWallet(interval, timeout) {
         const endtime = Date.now() + timeout;
@@ -68,7 +78,12 @@
                 });
 
                 if (response.status === 200) {
-                    window.location.assign(resultUrl);
+                    await handle200();
+                    return;
+                }
+
+                if (response.status === 202) {
+                    setTimeout(poll, interval);
                     return;
                 }
 

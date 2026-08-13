@@ -1,5 +1,6 @@
 package no.idporten.eudiw.bevisgenerator.web;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import no.idporten.eudiw.bevisgenerator.exception.IssuerUiException;
 import no.idporten.eudiw.bevisgenerator.integration.issuerserver.IssuerServerService;
@@ -11,6 +12,7 @@ import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.Verifi
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationStatus;
 import no.idporten.eudiw.bevisgenerator.integration.verifierservice.model.VerificationTransactionData;
 import no.idporten.eudiw.bevisgenerator.web.models.StartVerificationForm;
+import org.springframework.boot.web.server.servlet.Session;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -60,7 +62,8 @@ public class VerificationController {
     @PostMapping("/verification-start")
     public ModelAndView startVerification(@Valid @ModelAttribute("verificationForm") StartVerificationForm form,
                                           BindingResult bindingResult,
-                                          RedirectAttributes redirectAttributes) {
+                                          RedirectAttributes redirectAttributes,
+                                         HttpSession session) {
         List<CredentialDefinitionDisplayData> credentialDefinitions = dcqlService.createCredentialDefinitionDisplayData(
                 issuerServerService.getAllCredentialIssuerMetadata()
         );
@@ -84,8 +87,11 @@ public class VerificationController {
             return baseView(form, credentialDefinitions);
         }
 
+
         String dcql = dcqlService.buildDcql(credentialDefinition, form.selectedClaimPaths());
         VerificationTransactionData verificationTransactionData = verifierService.startVerification(dcql);
+
+        session.setAttribute("verification-transaction-id", verificationTransactionData.verificationStartResponse().verifierTransactionId());
 
         redirectAttributes.addFlashAttribute("qrCode", verificationTransactionData.verificationStartResponse().authorizationRequestQrCode());
         redirectAttributes.addFlashAttribute("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest());
@@ -103,8 +109,8 @@ public class VerificationController {
         return new ModelAndView("verification-presentation");
     }
 
-    @GetMapping("/verification-result")
-    public ModelAndView verificationResult(String transactionId) {
+    @GetMapping("/verification-result/{transaction-id}")
+    public ModelAndView verificationResult(@PathVariable("transaction-id") String transactionId) {
         if (transactionId == null || transactionId.isBlank()) {
             throw new IssuerUiException("Missing transactionId");
         }
@@ -113,6 +119,12 @@ public class VerificationController {
         return new ModelAndView("verification-result")
                 .addObject("result", result)
                 .addObject("resultJson", toJsonString(result.credentials()));
+    }
+
+    @GetMapping("/verification-presentation-redirect")
+    public ModelAndView verificationPresentationRedirect(HttpSession session) {
+        String verificationTransactionId = (String) session.getAttribute("verification-transaction-id");
+        return verificationResult(verificationTransactionId);
     }
 
     @GetMapping("/verification-presentation/{transactionId}/status")

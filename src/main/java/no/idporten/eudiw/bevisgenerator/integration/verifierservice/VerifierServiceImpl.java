@@ -126,7 +126,8 @@ public class VerifierServiceImpl implements VerifierService {
     private String buildApiRequest(String dcql) {
         return """
                 {
-                  "dcql_query": %s
+                  "dcql_query": %s,
+                  "redirect_uri": "http://localhost:9290/verification-presentation-redirect"
                 }""".formatted(dcql);
     }
 
