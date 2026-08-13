@@ -122,15 +122,6 @@ public class VerifierServiceImpl implements VerifierService {
         }
     }
 
-    private String buildApiRequest(String dcql, String redirectUri) {
-        return """
-                {
-                  "dcql_query": %s,
-                  "redirect_uri": "%s"
-                }""".formatted(dcql, redirectUri);
-
-    }
-
     private static ResponseErrorHandler verifierErrorHandler() {
         return new ResponseErrorHandler() {
             @Override

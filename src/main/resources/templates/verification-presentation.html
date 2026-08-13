@@ -49,8 +49,6 @@
     const statusEndpoint = /*[[@{/verification-presentation/{transactionId}/status(transactionId=${transactionId})}]]*/ "";
     const resultUrl = /*[[@{/verification-result/{transactionId}(transactionId=${transactionId})}]]*/ "";
 
-    window.addEventListener("visibilitychange", (e) => {console.log(e)})
-
     const handle200 = async () => {
         if (document.visibilityState === "visible") {
             window.location.assign(resultUrl);

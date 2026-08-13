@@ -6,6 +6,6 @@ public record VerificationStatus(
         @JsonProperty("status")
         String status,
 
-        @JsonProperty("verifier-transaction-id")
+        @JsonProperty("verifier_transaction_id")
         String verifierTransactionId
 ) { }

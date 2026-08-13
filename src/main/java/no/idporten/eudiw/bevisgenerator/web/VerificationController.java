@@ -27,6 +27,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Controller
 public class VerificationController {
@@ -91,12 +92,12 @@ public class VerificationController {
             return baseView(form, credentialDefinitions);
         }
 
-        String sessionId = session.getId();
-        String requestBody = buildStartVerificationRequestBody(credentialDefinition, form.selectedClaimPaths(), sessionId);
+        String uniqueKey = UUID.randomUUID().toString();
+        String requestBody = buildStartVerificationRequestBody(credentialDefinition, form.selectedClaimPaths(), uniqueKey);
 
         VerificationTransactionData verificationTransactionData = verifierService.startVerification(requestBody);
 
-        session.setAttribute("verification-transaction-id", verificationTransactionData.verificationStartResponse().verifierTransactionId());
+        session.setAttribute("verificationTransactionData", verificationTransactionData);
 
         redirectAttributes.addFlashAttribute("qrCode", verificationTransactionData.verificationStartResponse().authorizationRequestQrCode());
         redirectAttributes.addFlashAttribute("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest());
@@ -106,19 +107,30 @@ public class VerificationController {
         redirectAttributes.addFlashAttribute("requestUri", verificationTransactionData.requestUri());
         redirectAttributes.addFlashAttribute("responseBody", toJsonString(verificationTransactionData.verificationStartResponse()));
 
-        return new ModelAndView("redirect:/verification-presentation/" + sessionId);
+        return new ModelAndView("redirect:/verification-presentation/" + uniqueKey);
     }
 
-    @GetMapping("/verification-presentation/{session-id}")
-    public ModelAndView verificationPresentation(@PathVariable("session-id") String sessionId) {
-        return new ModelAndView("verification-presentation");
+    @GetMapping("/verification-presentation/{unique-key}")
+    public ModelAndView verificationPresentation(@PathVariable("unique-key") String uniqueKey, HttpSession session) {
+        VerificationTransactionData verificationTransactionData = (VerificationTransactionData) session.getAttribute("verificationTransactionData");
+
+        return new ModelAndView("verification-presentation")
+                .addObject("qrCode", verificationTransactionData.verificationStartResponse().authorizationRequestQrCode())
+                .addObject("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest())
+                .addObject("transactionId", verificationTransactionData.verificationStartResponse().verifierTransactionId())
+                .addObject("statusUri", verificationTransactionData.statusUri())
+                .addObject("requestBody", toJsonString(verificationTransactionData.requestBody()))
+                .addObject("requestUri", verificationTransactionData.requestUri())
+                .addObject("responseBody", toJsonString(verificationTransactionData.verificationStartResponse()));
     }
 
     @GetMapping("/verification-result/{transaction-id}")
-    public ModelAndView verificationResult(@PathVariable("transaction-id") String transactionId) {
+    public ModelAndView verificationResult(@PathVariable("transaction-id") String transactionId, HttpSession session) {
         if (transactionId == null || transactionId.isBlank()) {
             throw new IssuerUiException("Missing transactionId");
         }
+
+        session.removeAttribute("verificationTransactionData");
 
         VerificationResult result = verifierService.retrieveVerificationResult(transactionId);
         return new ModelAndView("verification-result")
@@ -163,12 +175,12 @@ public class VerificationController {
                 .addObject("selectedClaimPathsJson", toJsonString(form.selectedClaimPaths(), false));
     }
 
-    private String buildStartVerificationRequestBody(CredentialDefinitionDisplayData credentialDefinition, List<String> selectedClaimPaths, String sessionId) {
+    private String buildStartVerificationRequestBody(CredentialDefinitionDisplayData credentialDefinition, List<String> selectedClaimPaths, String uniqueKey) {
         Map<String, Object> dcql = dcqlService.buildDcqlMap(credentialDefinition, selectedClaimPaths);
 
         String redirectUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/verification-presentation/{session-id}")
-                .buildAndExpand(sessionId)
+                .buildAndExpand(uniqueKey)
                 .toString();
 
         return toJsonString(Map.of(
