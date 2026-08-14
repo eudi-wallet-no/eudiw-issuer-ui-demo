@@ -51,7 +51,6 @@
     const sameDeviceButton = document.getElementById("same-device-button");
 
     let sameDeviceFlow = false;
-    let redirected = false;
 
     sameDeviceButton.addEventListener("click", () => {
         sameDeviceFlow = true;
@@ -63,25 +62,16 @@
 
     function sameDeviceFlowRedirect() {
         const redirect = () => {
-            if (redirected) {
-                return;
-            }
-
-            redirected = true;
-
-            document.removeEventListener("visibilitychange", redirect);
             window.removeEventListener("focus", redirect);
-
             document.location.assign(resultUrl);
         }
 
-        document.addEventListener("visibilitychange", redirect);
         window.addEventListener("focus", redirect);
     }
 
 
     const handle200 = async () => {
-        if (!sameDeviceFlow && document.hasFocus()) {
+        if (!sameDeviceFlow && window.hasFocus()) {
             document.location.assign(resultUrl);
         }
         else {
