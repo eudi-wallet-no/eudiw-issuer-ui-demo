@@ -11,7 +11,7 @@ jobs:
       packages: write
       id-token: write
     with:
-      image-name: digital-lommebok-verifier-demo
+      image-name: digital-lommebok-issuer-ui-demo
       java-version: 25
       lifecycle: 'development'
     secrets: inherit
@@ -22,10 +22,10 @@ jobs:
       pull-requests: read
     needs: call-workflow-image-build-publish
     with:
-      application-name: digital-lommebok-verifier-demo
+      application-name: digital-lommebok-issuer-ui-demo
       deployment-environment: systest
       image-digest: ${{ needs.call-workflow-image-build-publish.outputs.image-digest }}
-      image-name: digital-lommebok-verifier-demo
+      image-name: digital-lommebok-issuer-ui-demo
       image-version: ${{ needs.call-workflow-image-build-publish.outputs.image-version }}
       kubernetes-repo: digital-lommebok-cd
       product-name: digital-lommebok
