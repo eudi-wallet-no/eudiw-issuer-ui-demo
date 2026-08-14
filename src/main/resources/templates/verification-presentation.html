@@ -60,7 +60,7 @@
         statusMessage.textContent = message;
     }
 
-    function sameDeviceFlowRedirect() {
+    function redirectOnFocus() {
         const redirect = () => {
             window.removeEventListener("focus", redirect);
             document.location.assign(resultUrl);
@@ -75,7 +75,7 @@
             document.location.assign(resultUrl);
         }
         else {
-            sameDeviceFlowRedirect();
+            redirectOnFocus();
         }
     };
 
