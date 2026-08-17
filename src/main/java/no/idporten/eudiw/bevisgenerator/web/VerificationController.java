@@ -125,11 +125,7 @@ public class VerificationController {
 
         String transactionId = getTransactionIdFromSession(verificationId, session);
 
-        VerificationResult result = (VerificationResult) session.getAttribute(getVerificationTransactionKey("result", verificationId));
-        if (result == null) {
-            result = verifierService.retrieveVerificationResult(transactionId);
-            session.setAttribute(getVerificationTransactionKey("result", verificationId), result);
-        }
+        VerificationResult result = verifierService.retrieveVerificationResult(transactionId);
 
         return new ModelAndView("verification-result")
                 .addObject("result", result)
@@ -187,7 +183,7 @@ public class VerificationController {
         Map<String, Object> dcql = dcqlService.buildDcqlMap(credentialDefinition, selectedClaimPaths);
 
         String redirectUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/verification-result/{verification-id}")
+                .path("/verification-presentation/{verification-id}")
                 .buildAndExpand(verificationId)
                 .toString();
 
