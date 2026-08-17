@@ -97,14 +97,18 @@ public class VerificationController {
 
         VerificationTransactionData verificationTransactionData = verifierService.startVerification(requestBody);
 
-        session.setAttribute(getVerificationTransactionKey("data", verificationId), verificationTransactionData);
+        session.setAttribute(getVerificationTransactionKey(verificationId), verificationTransactionData);
 
         return new ModelAndView("redirect:/verification-presentation/" + verificationId);
     }
 
     @GetMapping("/verification-presentation/{verification-id}")
     public ModelAndView verificationPresentation(@PathVariable("verification-id") String verificationId, HttpSession session) {
-        VerificationTransactionData verificationTransactionData = (VerificationTransactionData) session.getAttribute(getVerificationTransactionKey("data", verificationId));
+        VerificationTransactionData verificationTransactionData = (VerificationTransactionData) session.getAttribute(getVerificationTransactionKey(verificationId));
+
+        if (verificationTransactionData == null) {
+            throw new IssuerUiException("Missing verification transaction data for verificationId: " + verificationId);
+        }
 
         return new ModelAndView("verification-presentation")
                 .addObject("verificationId", verificationId)
@@ -124,6 +128,8 @@ public class VerificationController {
         }
 
         String transactionId = getTransactionIdFromSession(verificationId, session);
+
+        session.removeAttribute(getVerificationTransactionKey(verificationId));
 
         VerificationResult result = verifierService.retrieveVerificationResult(transactionId);
 
@@ -156,12 +162,15 @@ public class VerificationController {
     }
 
     private static String getTransactionIdFromSession(String verificationId, HttpSession session) {
-        VerificationTransactionData verificationTransactionData = (VerificationTransactionData) session.getAttribute(getVerificationTransactionKey("data", verificationId));
+        VerificationTransactionData verificationTransactionData = (VerificationTransactionData) session.getAttribute(getVerificationTransactionKey(verificationId));
+        if (verificationTransactionData == null) {
+            throw new IssuerUiException("Missing verification transaction data for verificationId=" + verificationId);
+        }
         return verificationTransactionData.verificationStartResponse().verifierTransactionId();
     }
 
-    private static String getVerificationTransactionKey(String type, String verificationId) {
-        return "verification_transaction_%s_%s".formatted(type, verificationId);
+    private static String getVerificationTransactionKey(String verificationId) {
+        return "verification_transaction_data_%s".formatted(verificationId);
     }
 
     private ModelAndView baseView(StartVerificationForm form) {
