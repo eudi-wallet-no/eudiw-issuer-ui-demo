@@ -99,15 +99,6 @@ public class VerificationController {
 
         session.setAttribute(getVerificationTransactionKey("data", verificationId), verificationTransactionData);
 
-        redirectAttributes.addFlashAttribute("verificationId", verificationId);
-        redirectAttributes.addFlashAttribute("qrCode", verificationTransactionData.verificationStartResponse().authorizationRequestQrCode());
-        redirectAttributes.addFlashAttribute("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest());
-        redirectAttributes.addFlashAttribute("transactionId", verificationTransactionData.verificationStartResponse().verifierTransactionId());
-        redirectAttributes.addFlashAttribute("statusUri", verificationTransactionData.statusUri());
-        redirectAttributes.addFlashAttribute("requestBody", toJsonString(verificationTransactionData.requestBody()));
-        redirectAttributes.addFlashAttribute("requestUri", verificationTransactionData.requestUri());
-        redirectAttributes.addFlashAttribute("responseBody", toJsonString(verificationTransactionData.verificationStartResponse()));
-
         return new ModelAndView("redirect:/verification-presentation/" + verificationId);
     }
 
@@ -134,13 +125,11 @@ public class VerificationController {
 
         String transactionId = getTransactionIdFromSession(verificationId, session);
 
-        VerificationResult sessionResult = (VerificationResult) session.getAttribute(getVerificationTransactionKey("result", verificationId));
-
-        VerificationResult result = sessionResult == null
-                ? verifierService.retrieveVerificationResult(transactionId)
-                : sessionResult;
-
-        session.setAttribute(getVerificationTransactionKey("result", verificationId), result);
+        VerificationResult result = (VerificationResult) session.getAttribute(getVerificationTransactionKey("result", verificationId));
+        if (result == null) {
+            result = verifierService.retrieveVerificationResult(transactionId);
+            session.setAttribute(getVerificationTransactionKey("result", verificationId), result);
+        }
 
         return new ModelAndView("verification-result")
                 .addObject("result", result)
