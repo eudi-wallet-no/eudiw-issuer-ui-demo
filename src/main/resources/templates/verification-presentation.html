@@ -46,8 +46,8 @@
 <footer th:replace="~{fragments/general :: page_footer_fragment(issuer=${issuerUrl})}"></footer>
 <script th:inline="javascript">
     const statusMessage = document.getElementById("verification-status-message");
-    const statusEndpoint = /*[[@{/verification-presentation/{verification-id}/status(verification-id=${verificationId})}]]*/ "";
-    const resultUrl = /*[[@{/verification-result/{verification-id}(verification-id=${verificationId})}]]*/ "";
+    const statusEndpoint = /*[[@{/verification-presentation/{verificationId}/status(verificationId=${verificationId})}]]*/ "";
+    const resultUrl = /*[[@{/verification-result/{verificationId}(verificationId=${verificationId})}]]*/ "";
     const sameDeviceButton = document.getElementById("same-device-button");
 
     let sameDeviceFlow = false;
