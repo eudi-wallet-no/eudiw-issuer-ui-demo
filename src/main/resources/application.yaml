@@ -4,7 +4,7 @@ server:
   servlet:
     context-path: /
     session:
-      timeout: 5s
+      timeout: 1m
 
 spring:
   threads:
