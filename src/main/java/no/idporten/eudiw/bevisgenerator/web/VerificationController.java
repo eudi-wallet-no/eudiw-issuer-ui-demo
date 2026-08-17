@@ -97,8 +97,9 @@ public class VerificationController {
 
         VerificationTransactionData verificationTransactionData = verifierService.startVerification(requestBody);
 
-        session.setAttribute("verificationTransactionData", verificationTransactionData);
+        session.setAttribute(getVerificationTransactionKey("data", verificationId), verificationTransactionData);
 
+        redirectAttributes.addFlashAttribute("verificationId", verificationId);
         redirectAttributes.addFlashAttribute("qrCode", verificationTransactionData.verificationStartResponse().authorizationRequestQrCode());
         redirectAttributes.addFlashAttribute("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest());
         redirectAttributes.addFlashAttribute("transactionId", verificationTransactionData.verificationStartResponse().verifierTransactionId());
@@ -112,9 +113,10 @@ public class VerificationController {
 
     @GetMapping("/verification-presentation/{verification-id}")
     public ModelAndView verificationPresentation(@PathVariable("verification-id") String verificationId, HttpSession session) {
-        VerificationTransactionData verificationTransactionData = (VerificationTransactionData) session.getAttribute("verificationTransactionData");
+        VerificationTransactionData verificationTransactionData = (VerificationTransactionData) session.getAttribute(getVerificationTransactionKey("data", verificationId));
 
         return new ModelAndView("verification-presentation")
+                .addObject("verificationId", verificationId)
                 .addObject("qrCode", verificationTransactionData.verificationStartResponse().authorizationRequestQrCode())
                 .addObject("authorizationRequest", verificationTransactionData.verificationStartResponse().authorizationRequest())
                 .addObject("transactionId", verificationTransactionData.verificationStartResponse().verifierTransactionId())
@@ -124,26 +126,34 @@ public class VerificationController {
                 .addObject("responseBody", toJsonString(verificationTransactionData.verificationStartResponse()));
     }
 
-    @GetMapping("/verification-result/{transaction-id}")
-    public ModelAndView verificationResult(@PathVariable("transaction-id") String transactionId, HttpSession session) {
-        if (transactionId == null || transactionId.isBlank()) {
-            throw new IssuerUiException("Missing transactionId");
+    @GetMapping("/verification-result/{verification-id}")
+    public ModelAndView verificationResult(@PathVariable("verification-id") String verificationId, HttpSession session) {
+        if (verificationId == null || verificationId.isBlank()) {
+            throw new IssuerUiException("Missing verificationId");
         }
 
-        session.removeAttribute("verificationTransactionData");
+        String transactionId = getTransactionIdFromSession(verificationId, session);
 
-        VerificationResult result = verifierService.retrieveVerificationResult(transactionId);
+        VerificationResult sessionResult = (VerificationResult) session.getAttribute(getVerificationTransactionKey("result", verificationId));
+
+        VerificationResult result = sessionResult == null
+                ? verifierService.retrieveVerificationResult(transactionId)
+                : sessionResult;
+
+        session.setAttribute(getVerificationTransactionKey("result", verificationId), result);
+
         return new ModelAndView("verification-result")
                 .addObject("result", result)
                 .addObject("resultJson", toJsonString(result.credentials()));
     }
 
-    @GetMapping("/verification-presentation/{transactionId}/status")
-    public ResponseEntity<?> verificationStatus(@PathVariable String transactionId) {
-        if (transactionId == null || transactionId.isBlank()) {
-            throw new IssuerUiException("Missing transactionId");
+    @GetMapping("/verification-presentation/{verification-id}/status")
+    public ResponseEntity<?> verificationStatus(@PathVariable("verification-id") String verificationId, HttpSession session) {
+        if (verificationId == null || verificationId.isBlank()) {
+            throw new IssuerUiException("Missing verificationId");
         }
 
+        String transactionId = getTransactionIdFromSession(verificationId, session);
         VerificationStatus verificationStatus = verifierService.retrieveVerificationStatus(transactionId);
         String status = verificationStatus.status();
 
@@ -158,6 +168,15 @@ public class VerificationController {
         }
 
         return ResponseEntity.internalServerError().build();
+    }
+
+    private static String getTransactionIdFromSession(String verificationId, HttpSession session) {
+        VerificationTransactionData verificationTransactionData = (VerificationTransactionData) session.getAttribute(getVerificationTransactionKey("data", verificationId));
+        return verificationTransactionData.verificationStartResponse().verifierTransactionId();
+    }
+
+    private static String getVerificationTransactionKey(String type, String verificationId) {
+        return "verification_transaction_%s_%s".formatted(type, verificationId);
     }
 
     private ModelAndView baseView(StartVerificationForm form) {
@@ -179,7 +198,7 @@ public class VerificationController {
         Map<String, Object> dcql = dcqlService.buildDcqlMap(credentialDefinition, selectedClaimPaths);
 
         String redirectUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/verification-presentation/{session-id}")
+                .path("/verification-result/{verification-id}")
                 .buildAndExpand(verificationId)
                 .toString();
 
