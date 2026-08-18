@@ -19,7 +19,7 @@
         <p id="verification-status-message" class="ds-paragraph" style="margin-top: var(--ds-size-3);"></p>
         <div class="flex-container" style="min-width: unset">
             <a th:href="@{/verification-result/{verificationId}(verificationId=${verificationId})}" id="navigate-to-result-button" class="ds-button" style="display:none;">
-                Se resultat
+                Sjå resultatet
             </a>
             <a th:href="${authorizationRequest}" id="same-device-button" class="ds-button" type="button" data-variant="primary" style="min-width:75px">
                 Opne på mobilen
@@ -88,7 +88,7 @@
             debouncedRedirectToResultPage();
         }
 
-        updateStatusMessage("Verifikasjonen er fullført. Klikk på knappen under for å sjå resultatet.");
+        updateStatusMessage("Verifikasjonen er fullført.");
         navigateToResultButton.style.display = "block";
         sameDeviceButton.style.display = "none";
         qrCode.style.display = "none";
