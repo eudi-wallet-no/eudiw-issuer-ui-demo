@@ -18,7 +18,9 @@
         </div>
         <p id="verification-status-message" class="ds-paragraph" style="margin-top: var(--ds-size-3);"></p>
         <div class="flex-container" style="min-width: unset">
-            <a class="ds-button" style="display:none;" id="navigate-to-result-button" th:href="@{/verification-result/{verificationId}(verificationId=${verificationId})}">Se resultat</a>
+            <a th:href="@{/verification-result/{verificationId}(verificationId=${verificationId})}" id="navigate-to-result-button" class="ds-button" style="display:none;">
+                Se resultat
+            </a>
             <a th:href="${authorizationRequest}" id="same-device-button" class="ds-button" type="button" data-variant="primary" style="min-width:75px">
                 Opne på mobilen
             </a>
@@ -64,18 +66,26 @@
     }
 
     function redirectToResultPage() {
-        setTimeout(() => {
-            document.location.assign(resultUrl);
-        }, 500);
+        document.location.assign(resultUrl);
     }
+
+    const debounce = (func, wait) => {
+        let timeout;
+        return function (...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    };
+
+    const debouncedRedirectToResultPage = debounce(redirectToResultPage, 500);
 
     function waitForUserBeforeRedirectToResultPage() {
         const redirect = () => {
             window.removeEventListener("focus", redirect);
+            window.removeEventListener("pageshow", redirect);
             document.removeEventListener("visibilitychange", redirect);
-            document.removeEventListener("scroll", redirect);
 
-            redirectToResultPage();
+            debouncedRedirectToResultPage();
         }
 
         updateStatusMessage("Verifikasjonen er fullført. Klikk på knappen under for å sjå resultatet.");
@@ -84,13 +94,13 @@
         qrCode.style.display = "none";
 
         window.addEventListener("focus", redirect);
+        window.addEventListener("pageshow", redirect);
         document.addEventListener("visibilitychange", redirect);
-        document.addEventListener("scroll", redirect);
     }
 
     const handle200 = async () => {
         if (!sameDeviceFlow) {
-            redirectToResultPage();
+            debouncedRedirectToResultPage();
         }
         else {
             waitForUserBeforeRedirectToResultPage();
