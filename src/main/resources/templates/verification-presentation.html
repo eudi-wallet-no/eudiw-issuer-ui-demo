@@ -18,6 +18,7 @@
         </div>
         <p id="verification-status-message" class="ds-paragraph" style="margin-top: var(--ds-size-3);"></p>
         <div class="flex-container" style="min-width: unset">
+            <a class="ds-button" style="display:none;" id="navigate-to-result-button" th:href="@{/verification-result/{verificationId}(verificationId=${verificationId})}">Se resultat</a>
             <a th:href="${authorizationRequest}" id="same-device-button" class="ds-button" type="button" data-variant="primary" style="min-width:75px">
                 Opne på mobilen
             </a>
@@ -49,6 +50,8 @@
     const statusEndpoint = /*[[@{/verification-presentation/{verificationId}/status(verificationId=${verificationId})}]]*/ "";
     const resultUrl = /*[[@{/verification-result/{verificationId}(verificationId=${verificationId})}]]*/ "";
     const sameDeviceButton = document.getElementById("same-device-button");
+    const navigateToResultButton = document.getElementById("navigate-to-result-button");
+    const qrCode = document.getElementById("cross-device-request");
 
     let sameDeviceFlow = false;
 
@@ -60,29 +63,37 @@
         statusMessage.textContent = message;
     }
 
-    function redirectToResult() {
+    function redirectToResultPage() {
+        setTimeout(() => {
+            document.location.assign(resultUrl);
+        }, 500);
+    }
+
+    function waitForUserBeforeRedirectToResultPage() {
         const redirect = () => {
             window.removeEventListener("focus", redirect);
             document.removeEventListener("visibilitychange", redirect);
-            document.removeEventListener("click", redirect);
+            document.removeEventListener("scroll", redirect);
 
-            setTimeout(() => {
-                document.location.assign(resultUrl);
-            }, 500);
+            redirectToResultPage();
         }
+
+        updateStatusMessage("Verifikasjonen er fullført. Klikk på knappen under for å sjå resultatet.");
+        navigateToResultButton.style.display = "block";
+        sameDeviceButton.style.display = "none";
+        qrCode.style.display = "none";
 
         window.addEventListener("focus", redirect);
         document.addEventListener("visibilitychange", redirect);
-        document.addEventListener("click", redirect);
+        document.addEventListener("scroll", redirect);
     }
-
 
     const handle200 = async () => {
         if (!sameDeviceFlow) {
-            document.location.assign(resultUrl);
+            redirectToResultPage();
         }
         else {
-            redirectToResult();
+            waitForUserBeforeRedirectToResultPage();
         }
     };
 
